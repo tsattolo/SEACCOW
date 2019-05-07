@@ -30,5 +30,6 @@ obj
 *.swp
 *.a
 nios_workspace
-.o
-.srec
+*.o
+*.srec
+.qsys_edit
