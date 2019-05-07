@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><intel_fpga_monitor_program_project version="1.0">
     <architecture>Nios II</architecture>
     <system>
-        <system_info filepath="true">../ethernet_pt.sopcinfo</system_info>
-        <system_sof filepath="true">../output_files/seaccow_time_limited.sof</system_sof>
+        <system_info filepath="true">../../generated/ethernet_pt.sopcinfo</system_info>
+        <system_sof filepath="true">../../output_files/seaccow_time_limited.sof</system_sof>
         <board>Not Required</board>
         <cable>USB-Blaster [1-9]</cable>
         <processor>nios2</processor>
@@ -12,7 +12,7 @@
     <program>
         <type>C Program</type>
         <source_files>
-            <source_file filepath="true">main.c</source_file>
+            <source_file filepath="true">seaccow.c</source_file>
         </source_files>
         <options>
             <compiler_flags>-g -O1 -ffunction-sections -fverbose-asm -fno-inline -mno-cache-volatile</compiler_flags>

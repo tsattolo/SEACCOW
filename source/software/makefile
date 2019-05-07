@@ -28,17 +28,17 @@ OCFLAGS		:= -O srec
 
 # Files
 HDRS		:=
-SRCS		:= main.c
+SRCS		:= seaccow.c
 OBJS		:= $(patsubst %, %.o, $(SRCS))
 
 # Targets
-compile: main.srec
+compile: seaccow.srec
 
-main.srec: main.elf
+seaccow.srec: seaccow.elf
 	$(RM) $@
 	$(OC) $(OCFLAGS) $< $@
 
-main.elf: $(OBJS)
+seaccow.elf: $(OBJS)
 	$(RM) $@
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
@@ -51,5 +51,5 @@ main.elf: $(OBJS)
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	$(RM) main.srec main.elf $(OBJS)
+	$(RM) seaccow.srec seaccow.elf $(OBJS)
 
