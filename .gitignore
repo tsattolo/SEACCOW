@@ -33,3 +33,4 @@ nios_workspace
 *.o
 *.srec
 .qsys_edit
+greybox_tmp/
