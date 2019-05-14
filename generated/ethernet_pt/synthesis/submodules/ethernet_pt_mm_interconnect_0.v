@@ -84,33 +84,6 @@ module ethernet_pt_mm_interconnect_0 (
 	wire   [3:0] rsp_mux_001_src_channel;                                                     // rsp_mux_001:src_channel -> nios2_instruction_master_agent:rp_channel
 	wire         rsp_mux_001_src_startofpacket;                                               // rsp_mux_001:src_startofpacket -> nios2_instruction_master_agent:rp_startofpacket
 	wire         rsp_mux_001_src_endofpacket;                                                 // rsp_mux_001:src_endofpacket -> nios2_instruction_master_agent:rp_endofpacket
-	wire  [31:0] tse_1_control_port_agent_m0_readdata;                                        // tse_1_control_port_translator:uav_readdata -> tse_1_control_port_agent:m0_readdata
-	wire         tse_1_control_port_agent_m0_waitrequest;                                     // tse_1_control_port_translator:uav_waitrequest -> tse_1_control_port_agent:m0_waitrequest
-	wire         tse_1_control_port_agent_m0_debugaccess;                                     // tse_1_control_port_agent:m0_debugaccess -> tse_1_control_port_translator:uav_debugaccess
-	wire  [12:0] tse_1_control_port_agent_m0_address;                                         // tse_1_control_port_agent:m0_address -> tse_1_control_port_translator:uav_address
-	wire   [3:0] tse_1_control_port_agent_m0_byteenable;                                      // tse_1_control_port_agent:m0_byteenable -> tse_1_control_port_translator:uav_byteenable
-	wire         tse_1_control_port_agent_m0_read;                                            // tse_1_control_port_agent:m0_read -> tse_1_control_port_translator:uav_read
-	wire         tse_1_control_port_agent_m0_readdatavalid;                                   // tse_1_control_port_translator:uav_readdatavalid -> tse_1_control_port_agent:m0_readdatavalid
-	wire         tse_1_control_port_agent_m0_lock;                                            // tse_1_control_port_agent:m0_lock -> tse_1_control_port_translator:uav_lock
-	wire  [31:0] tse_1_control_port_agent_m0_writedata;                                       // tse_1_control_port_agent:m0_writedata -> tse_1_control_port_translator:uav_writedata
-	wire         tse_1_control_port_agent_m0_write;                                           // tse_1_control_port_agent:m0_write -> tse_1_control_port_translator:uav_write
-	wire   [2:0] tse_1_control_port_agent_m0_burstcount;                                      // tse_1_control_port_agent:m0_burstcount -> tse_1_control_port_translator:uav_burstcount
-	wire         tse_1_control_port_agent_rf_source_valid;                                    // tse_1_control_port_agent:rf_source_valid -> tse_1_control_port_agent_rsp_fifo:in_valid
-	wire  [87:0] tse_1_control_port_agent_rf_source_data;                                     // tse_1_control_port_agent:rf_source_data -> tse_1_control_port_agent_rsp_fifo:in_data
-	wire         tse_1_control_port_agent_rf_source_ready;                                    // tse_1_control_port_agent_rsp_fifo:in_ready -> tse_1_control_port_agent:rf_source_ready
-	wire         tse_1_control_port_agent_rf_source_startofpacket;                            // tse_1_control_port_agent:rf_source_startofpacket -> tse_1_control_port_agent_rsp_fifo:in_startofpacket
-	wire         tse_1_control_port_agent_rf_source_endofpacket;                              // tse_1_control_port_agent:rf_source_endofpacket -> tse_1_control_port_agent_rsp_fifo:in_endofpacket
-	wire         tse_1_control_port_agent_rsp_fifo_out_valid;                                 // tse_1_control_port_agent_rsp_fifo:out_valid -> tse_1_control_port_agent:rf_sink_valid
-	wire  [87:0] tse_1_control_port_agent_rsp_fifo_out_data;                                  // tse_1_control_port_agent_rsp_fifo:out_data -> tse_1_control_port_agent:rf_sink_data
-	wire         tse_1_control_port_agent_rsp_fifo_out_ready;                                 // tse_1_control_port_agent:rf_sink_ready -> tse_1_control_port_agent_rsp_fifo:out_ready
-	wire         tse_1_control_port_agent_rsp_fifo_out_startofpacket;                         // tse_1_control_port_agent_rsp_fifo:out_startofpacket -> tse_1_control_port_agent:rf_sink_startofpacket
-	wire         tse_1_control_port_agent_rsp_fifo_out_endofpacket;                           // tse_1_control_port_agent_rsp_fifo:out_endofpacket -> tse_1_control_port_agent:rf_sink_endofpacket
-	wire         cmd_mux_src_valid;                                                           // cmd_mux:src_valid -> tse_1_control_port_agent:cp_valid
-	wire  [86:0] cmd_mux_src_data;                                                            // cmd_mux:src_data -> tse_1_control_port_agent:cp_data
-	wire         cmd_mux_src_ready;                                                           // tse_1_control_port_agent:cp_ready -> cmd_mux:src_ready
-	wire   [3:0] cmd_mux_src_channel;                                                         // cmd_mux:src_channel -> tse_1_control_port_agent:cp_channel
-	wire         cmd_mux_src_startofpacket;                                                   // cmd_mux:src_startofpacket -> tse_1_control_port_agent:cp_startofpacket
-	wire         cmd_mux_src_endofpacket;                                                     // cmd_mux:src_endofpacket -> tse_1_control_port_agent:cp_endofpacket
 	wire  [31:0] tse_0_control_port_agent_m0_readdata;                                        // tse_0_control_port_translator:uav_readdata -> tse_0_control_port_agent:m0_readdata
 	wire         tse_0_control_port_agent_m0_waitrequest;                                     // tse_0_control_port_translator:uav_waitrequest -> tse_0_control_port_agent:m0_waitrequest
 	wire         tse_0_control_port_agent_m0_debugaccess;                                     // tse_0_control_port_agent:m0_debugaccess -> tse_0_control_port_translator:uav_debugaccess
@@ -132,12 +105,39 @@ module ethernet_pt_mm_interconnect_0 (
 	wire         tse_0_control_port_agent_rsp_fifo_out_ready;                                 // tse_0_control_port_agent:rf_sink_ready -> tse_0_control_port_agent_rsp_fifo:out_ready
 	wire         tse_0_control_port_agent_rsp_fifo_out_startofpacket;                         // tse_0_control_port_agent_rsp_fifo:out_startofpacket -> tse_0_control_port_agent:rf_sink_startofpacket
 	wire         tse_0_control_port_agent_rsp_fifo_out_endofpacket;                           // tse_0_control_port_agent_rsp_fifo:out_endofpacket -> tse_0_control_port_agent:rf_sink_endofpacket
-	wire         cmd_mux_001_src_valid;                                                       // cmd_mux_001:src_valid -> tse_0_control_port_agent:cp_valid
-	wire  [86:0] cmd_mux_001_src_data;                                                        // cmd_mux_001:src_data -> tse_0_control_port_agent:cp_data
-	wire         cmd_mux_001_src_ready;                                                       // tse_0_control_port_agent:cp_ready -> cmd_mux_001:src_ready
-	wire   [3:0] cmd_mux_001_src_channel;                                                     // cmd_mux_001:src_channel -> tse_0_control_port_agent:cp_channel
-	wire         cmd_mux_001_src_startofpacket;                                               // cmd_mux_001:src_startofpacket -> tse_0_control_port_agent:cp_startofpacket
-	wire         cmd_mux_001_src_endofpacket;                                                 // cmd_mux_001:src_endofpacket -> tse_0_control_port_agent:cp_endofpacket
+	wire         cmd_mux_src_valid;                                                           // cmd_mux:src_valid -> tse_0_control_port_agent:cp_valid
+	wire  [86:0] cmd_mux_src_data;                                                            // cmd_mux:src_data -> tse_0_control_port_agent:cp_data
+	wire         cmd_mux_src_ready;                                                           // tse_0_control_port_agent:cp_ready -> cmd_mux:src_ready
+	wire   [3:0] cmd_mux_src_channel;                                                         // cmd_mux:src_channel -> tse_0_control_port_agent:cp_channel
+	wire         cmd_mux_src_startofpacket;                                                   // cmd_mux:src_startofpacket -> tse_0_control_port_agent:cp_startofpacket
+	wire         cmd_mux_src_endofpacket;                                                     // cmd_mux:src_endofpacket -> tse_0_control_port_agent:cp_endofpacket
+	wire  [31:0] tse_1_control_port_agent_m0_readdata;                                        // tse_1_control_port_translator:uav_readdata -> tse_1_control_port_agent:m0_readdata
+	wire         tse_1_control_port_agent_m0_waitrequest;                                     // tse_1_control_port_translator:uav_waitrequest -> tse_1_control_port_agent:m0_waitrequest
+	wire         tse_1_control_port_agent_m0_debugaccess;                                     // tse_1_control_port_agent:m0_debugaccess -> tse_1_control_port_translator:uav_debugaccess
+	wire  [12:0] tse_1_control_port_agent_m0_address;                                         // tse_1_control_port_agent:m0_address -> tse_1_control_port_translator:uav_address
+	wire   [3:0] tse_1_control_port_agent_m0_byteenable;                                      // tse_1_control_port_agent:m0_byteenable -> tse_1_control_port_translator:uav_byteenable
+	wire         tse_1_control_port_agent_m0_read;                                            // tse_1_control_port_agent:m0_read -> tse_1_control_port_translator:uav_read
+	wire         tse_1_control_port_agent_m0_readdatavalid;                                   // tse_1_control_port_translator:uav_readdatavalid -> tse_1_control_port_agent:m0_readdatavalid
+	wire         tse_1_control_port_agent_m0_lock;                                            // tse_1_control_port_agent:m0_lock -> tse_1_control_port_translator:uav_lock
+	wire  [31:0] tse_1_control_port_agent_m0_writedata;                                       // tse_1_control_port_agent:m0_writedata -> tse_1_control_port_translator:uav_writedata
+	wire         tse_1_control_port_agent_m0_write;                                           // tse_1_control_port_agent:m0_write -> tse_1_control_port_translator:uav_write
+	wire   [2:0] tse_1_control_port_agent_m0_burstcount;                                      // tse_1_control_port_agent:m0_burstcount -> tse_1_control_port_translator:uav_burstcount
+	wire         tse_1_control_port_agent_rf_source_valid;                                    // tse_1_control_port_agent:rf_source_valid -> tse_1_control_port_agent_rsp_fifo:in_valid
+	wire  [87:0] tse_1_control_port_agent_rf_source_data;                                     // tse_1_control_port_agent:rf_source_data -> tse_1_control_port_agent_rsp_fifo:in_data
+	wire         tse_1_control_port_agent_rf_source_ready;                                    // tse_1_control_port_agent_rsp_fifo:in_ready -> tse_1_control_port_agent:rf_source_ready
+	wire         tse_1_control_port_agent_rf_source_startofpacket;                            // tse_1_control_port_agent:rf_source_startofpacket -> tse_1_control_port_agent_rsp_fifo:in_startofpacket
+	wire         tse_1_control_port_agent_rf_source_endofpacket;                              // tse_1_control_port_agent:rf_source_endofpacket -> tse_1_control_port_agent_rsp_fifo:in_endofpacket
+	wire         tse_1_control_port_agent_rsp_fifo_out_valid;                                 // tse_1_control_port_agent_rsp_fifo:out_valid -> tse_1_control_port_agent:rf_sink_valid
+	wire  [87:0] tse_1_control_port_agent_rsp_fifo_out_data;                                  // tse_1_control_port_agent_rsp_fifo:out_data -> tse_1_control_port_agent:rf_sink_data
+	wire         tse_1_control_port_agent_rsp_fifo_out_ready;                                 // tse_1_control_port_agent:rf_sink_ready -> tse_1_control_port_agent_rsp_fifo:out_ready
+	wire         tse_1_control_port_agent_rsp_fifo_out_startofpacket;                         // tse_1_control_port_agent_rsp_fifo:out_startofpacket -> tse_1_control_port_agent:rf_sink_startofpacket
+	wire         tse_1_control_port_agent_rsp_fifo_out_endofpacket;                           // tse_1_control_port_agent_rsp_fifo:out_endofpacket -> tse_1_control_port_agent:rf_sink_endofpacket
+	wire         cmd_mux_001_src_valid;                                                       // cmd_mux_001:src_valid -> tse_1_control_port_agent:cp_valid
+	wire  [86:0] cmd_mux_001_src_data;                                                        // cmd_mux_001:src_data -> tse_1_control_port_agent:cp_data
+	wire         cmd_mux_001_src_ready;                                                       // tse_1_control_port_agent:cp_ready -> cmd_mux_001:src_ready
+	wire   [3:0] cmd_mux_001_src_channel;                                                     // cmd_mux_001:src_channel -> tse_1_control_port_agent:cp_channel
+	wire         cmd_mux_001_src_startofpacket;                                               // cmd_mux_001:src_startofpacket -> tse_1_control_port_agent:cp_startofpacket
+	wire         cmd_mux_001_src_endofpacket;                                                 // cmd_mux_001:src_endofpacket -> tse_1_control_port_agent:cp_endofpacket
 	wire  [31:0] nios2_debug_mem_slave_agent_m0_readdata;                                     // nios2_debug_mem_slave_translator:uav_readdata -> nios2_debug_mem_slave_agent:m0_readdata
 	wire         nios2_debug_mem_slave_agent_m0_waitrequest;                                  // nios2_debug_mem_slave_translator:uav_waitrequest -> nios2_debug_mem_slave_agent:m0_waitrequest
 	wire         nios2_debug_mem_slave_agent_m0_debugaccess;                                  // nios2_debug_mem_slave_agent:m0_debugaccess -> nios2_debug_mem_slave_translator:uav_debugaccess
@@ -214,22 +214,22 @@ module ethernet_pt_mm_interconnect_0 (
 	wire   [3:0] router_001_src_channel;                                                      // router_001:src_channel -> cmd_demux_001:sink_channel
 	wire         router_001_src_startofpacket;                                                // router_001:src_startofpacket -> cmd_demux_001:sink_startofpacket
 	wire         router_001_src_endofpacket;                                                  // router_001:src_endofpacket -> cmd_demux_001:sink_endofpacket
-	wire         tse_1_control_port_agent_rp_valid;                                           // tse_1_control_port_agent:rp_valid -> router_002:sink_valid
-	wire  [86:0] tse_1_control_port_agent_rp_data;                                            // tse_1_control_port_agent:rp_data -> router_002:sink_data
-	wire         tse_1_control_port_agent_rp_ready;                                           // router_002:sink_ready -> tse_1_control_port_agent:rp_ready
-	wire         tse_1_control_port_agent_rp_startofpacket;                                   // tse_1_control_port_agent:rp_startofpacket -> router_002:sink_startofpacket
-	wire         tse_1_control_port_agent_rp_endofpacket;                                     // tse_1_control_port_agent:rp_endofpacket -> router_002:sink_endofpacket
+	wire         tse_0_control_port_agent_rp_valid;                                           // tse_0_control_port_agent:rp_valid -> router_002:sink_valid
+	wire  [86:0] tse_0_control_port_agent_rp_data;                                            // tse_0_control_port_agent:rp_data -> router_002:sink_data
+	wire         tse_0_control_port_agent_rp_ready;                                           // router_002:sink_ready -> tse_0_control_port_agent:rp_ready
+	wire         tse_0_control_port_agent_rp_startofpacket;                                   // tse_0_control_port_agent:rp_startofpacket -> router_002:sink_startofpacket
+	wire         tse_0_control_port_agent_rp_endofpacket;                                     // tse_0_control_port_agent:rp_endofpacket -> router_002:sink_endofpacket
 	wire         router_002_src_valid;                                                        // router_002:src_valid -> rsp_demux:sink_valid
 	wire  [86:0] router_002_src_data;                                                         // router_002:src_data -> rsp_demux:sink_data
 	wire         router_002_src_ready;                                                        // rsp_demux:sink_ready -> router_002:src_ready
 	wire   [3:0] router_002_src_channel;                                                      // router_002:src_channel -> rsp_demux:sink_channel
 	wire         router_002_src_startofpacket;                                                // router_002:src_startofpacket -> rsp_demux:sink_startofpacket
 	wire         router_002_src_endofpacket;                                                  // router_002:src_endofpacket -> rsp_demux:sink_endofpacket
-	wire         tse_0_control_port_agent_rp_valid;                                           // tse_0_control_port_agent:rp_valid -> router_003:sink_valid
-	wire  [86:0] tse_0_control_port_agent_rp_data;                                            // tse_0_control_port_agent:rp_data -> router_003:sink_data
-	wire         tse_0_control_port_agent_rp_ready;                                           // router_003:sink_ready -> tse_0_control_port_agent:rp_ready
-	wire         tse_0_control_port_agent_rp_startofpacket;                                   // tse_0_control_port_agent:rp_startofpacket -> router_003:sink_startofpacket
-	wire         tse_0_control_port_agent_rp_endofpacket;                                     // tse_0_control_port_agent:rp_endofpacket -> router_003:sink_endofpacket
+	wire         tse_1_control_port_agent_rp_valid;                                           // tse_1_control_port_agent:rp_valid -> router_003:sink_valid
+	wire  [86:0] tse_1_control_port_agent_rp_data;                                            // tse_1_control_port_agent:rp_data -> router_003:sink_data
+	wire         tse_1_control_port_agent_rp_ready;                                           // router_003:sink_ready -> tse_1_control_port_agent:rp_ready
+	wire         tse_1_control_port_agent_rp_startofpacket;                                   // tse_1_control_port_agent:rp_startofpacket -> router_003:sink_startofpacket
+	wire         tse_1_control_port_agent_rp_endofpacket;                                     // tse_1_control_port_agent:rp_endofpacket -> router_003:sink_endofpacket
 	wire         router_003_src_valid;                                                        // router_003:src_valid -> rsp_demux_001:sink_valid
 	wire  [86:0] router_003_src_data;                                                         // router_003:src_data -> rsp_demux_001:sink_data
 	wire         router_003_src_ready;                                                        // rsp_demux_001:sink_ready -> router_003:src_ready
@@ -330,20 +330,20 @@ module ethernet_pt_mm_interconnect_0 (
 	wire   [3:0] rsp_demux_003_src1_channel;                                                  // rsp_demux_003:src1_channel -> rsp_mux_001:sink1_channel
 	wire         rsp_demux_003_src1_startofpacket;                                            // rsp_demux_003:src1_startofpacket -> rsp_mux_001:sink1_startofpacket
 	wire         rsp_demux_003_src1_endofpacket;                                              // rsp_demux_003:src1_endofpacket -> rsp_mux_001:sink1_endofpacket
-	wire         tse_1_control_port_agent_rdata_fifo_src_valid;                               // tse_1_control_port_agent:rdata_fifo_src_valid -> avalon_st_adapter:in_0_valid
-	wire  [33:0] tse_1_control_port_agent_rdata_fifo_src_data;                                // tse_1_control_port_agent:rdata_fifo_src_data -> avalon_st_adapter:in_0_data
-	wire         tse_1_control_port_agent_rdata_fifo_src_ready;                               // avalon_st_adapter:in_0_ready -> tse_1_control_port_agent:rdata_fifo_src_ready
-	wire         avalon_st_adapter_out_0_valid;                                               // avalon_st_adapter:out_0_valid -> tse_1_control_port_agent:rdata_fifo_sink_valid
-	wire  [33:0] avalon_st_adapter_out_0_data;                                                // avalon_st_adapter:out_0_data -> tse_1_control_port_agent:rdata_fifo_sink_data
-	wire         avalon_st_adapter_out_0_ready;                                               // tse_1_control_port_agent:rdata_fifo_sink_ready -> avalon_st_adapter:out_0_ready
-	wire   [0:0] avalon_st_adapter_out_0_error;                                               // avalon_st_adapter:out_0_error -> tse_1_control_port_agent:rdata_fifo_sink_error
-	wire         tse_0_control_port_agent_rdata_fifo_src_valid;                               // tse_0_control_port_agent:rdata_fifo_src_valid -> avalon_st_adapter_001:in_0_valid
-	wire  [33:0] tse_0_control_port_agent_rdata_fifo_src_data;                                // tse_0_control_port_agent:rdata_fifo_src_data -> avalon_st_adapter_001:in_0_data
-	wire         tse_0_control_port_agent_rdata_fifo_src_ready;                               // avalon_st_adapter_001:in_0_ready -> tse_0_control_port_agent:rdata_fifo_src_ready
-	wire         avalon_st_adapter_001_out_0_valid;                                           // avalon_st_adapter_001:out_0_valid -> tse_0_control_port_agent:rdata_fifo_sink_valid
-	wire  [33:0] avalon_st_adapter_001_out_0_data;                                            // avalon_st_adapter_001:out_0_data -> tse_0_control_port_agent:rdata_fifo_sink_data
-	wire         avalon_st_adapter_001_out_0_ready;                                           // tse_0_control_port_agent:rdata_fifo_sink_ready -> avalon_st_adapter_001:out_0_ready
-	wire   [0:0] avalon_st_adapter_001_out_0_error;                                           // avalon_st_adapter_001:out_0_error -> tse_0_control_port_agent:rdata_fifo_sink_error
+	wire         tse_0_control_port_agent_rdata_fifo_src_valid;                               // tse_0_control_port_agent:rdata_fifo_src_valid -> avalon_st_adapter:in_0_valid
+	wire  [33:0] tse_0_control_port_agent_rdata_fifo_src_data;                                // tse_0_control_port_agent:rdata_fifo_src_data -> avalon_st_adapter:in_0_data
+	wire         tse_0_control_port_agent_rdata_fifo_src_ready;                               // avalon_st_adapter:in_0_ready -> tse_0_control_port_agent:rdata_fifo_src_ready
+	wire         avalon_st_adapter_out_0_valid;                                               // avalon_st_adapter:out_0_valid -> tse_0_control_port_agent:rdata_fifo_sink_valid
+	wire  [33:0] avalon_st_adapter_out_0_data;                                                // avalon_st_adapter:out_0_data -> tse_0_control_port_agent:rdata_fifo_sink_data
+	wire         avalon_st_adapter_out_0_ready;                                               // tse_0_control_port_agent:rdata_fifo_sink_ready -> avalon_st_adapter:out_0_ready
+	wire   [0:0] avalon_st_adapter_out_0_error;                                               // avalon_st_adapter:out_0_error -> tse_0_control_port_agent:rdata_fifo_sink_error
+	wire         tse_1_control_port_agent_rdata_fifo_src_valid;                               // tse_1_control_port_agent:rdata_fifo_src_valid -> avalon_st_adapter_001:in_0_valid
+	wire  [33:0] tse_1_control_port_agent_rdata_fifo_src_data;                                // tse_1_control_port_agent:rdata_fifo_src_data -> avalon_st_adapter_001:in_0_data
+	wire         tse_1_control_port_agent_rdata_fifo_src_ready;                               // avalon_st_adapter_001:in_0_ready -> tse_1_control_port_agent:rdata_fifo_src_ready
+	wire         avalon_st_adapter_001_out_0_valid;                                           // avalon_st_adapter_001:out_0_valid -> tse_1_control_port_agent:rdata_fifo_sink_valid
+	wire  [33:0] avalon_st_adapter_001_out_0_data;                                            // avalon_st_adapter_001:out_0_data -> tse_1_control_port_agent:rdata_fifo_sink_data
+	wire         avalon_st_adapter_001_out_0_ready;                                           // tse_1_control_port_agent:rdata_fifo_sink_ready -> avalon_st_adapter_001:out_0_ready
+	wire   [0:0] avalon_st_adapter_001_out_0_error;                                           // avalon_st_adapter_001:out_0_error -> tse_1_control_port_agent:rdata_fifo_sink_error
 	wire         nios2_debug_mem_slave_agent_rdata_fifo_src_valid;                            // nios2_debug_mem_slave_agent:rdata_fifo_src_valid -> avalon_st_adapter_002:in_0_valid
 	wire  [33:0] nios2_debug_mem_slave_agent_rdata_fifo_src_data;                             // nios2_debug_mem_slave_agent:rdata_fifo_src_data -> avalon_st_adapter_002:in_0_data
 	wire         nios2_debug_mem_slave_agent_rdata_fifo_src_ready;                            // avalon_st_adapter_002:in_0_ready -> nios2_debug_mem_slave_agent:rdata_fifo_src_ready
@@ -505,26 +505,26 @@ module ethernet_pt_mm_interconnect_0 (
 		.AV_WRITE_WAIT_CYCLES           (1),
 		.AV_SETUP_WAIT_CYCLES           (0),
 		.AV_DATA_HOLD_CYCLES            (0)
-	) tse_1_control_port_translator (
+	) tse_0_control_port_translator (
 		.clk                    (sys_clk_clk_clk),                           //                      clk.clk
 		.reset                  (nios2_reset_reset_bridge_in_reset_reset),   //                    reset.reset
-		.uav_address            (tse_1_control_port_agent_m0_address),       // avalon_universal_slave_0.address
-		.uav_burstcount         (tse_1_control_port_agent_m0_burstcount),    //                         .burstcount
-		.uav_read               (tse_1_control_port_agent_m0_read),          //                         .read
-		.uav_write              (tse_1_control_port_agent_m0_write),         //                         .write
-		.uav_waitrequest        (tse_1_control_port_agent_m0_waitrequest),   //                         .waitrequest
-		.uav_readdatavalid      (tse_1_control_port_agent_m0_readdatavalid), //                         .readdatavalid
-		.uav_byteenable         (tse_1_control_port_agent_m0_byteenable),    //                         .byteenable
-		.uav_readdata           (tse_1_control_port_agent_m0_readdata),      //                         .readdata
-		.uav_writedata          (tse_1_control_port_agent_m0_writedata),     //                         .writedata
-		.uav_lock               (tse_1_control_port_agent_m0_lock),          //                         .lock
-		.uav_debugaccess        (tse_1_control_port_agent_m0_debugaccess),   //                         .debugaccess
-		.av_address             (tse_1_control_port_address),                //      avalon_anti_slave_0.address
-		.av_write               (tse_1_control_port_write),                  //                         .write
-		.av_read                (tse_1_control_port_read),                   //                         .read
-		.av_readdata            (tse_1_control_port_readdata),               //                         .readdata
-		.av_writedata           (tse_1_control_port_writedata),              //                         .writedata
-		.av_waitrequest         (tse_1_control_port_waitrequest),            //                         .waitrequest
+		.uav_address            (tse_0_control_port_agent_m0_address),       // avalon_universal_slave_0.address
+		.uav_burstcount         (tse_0_control_port_agent_m0_burstcount),    //                         .burstcount
+		.uav_read               (tse_0_control_port_agent_m0_read),          //                         .read
+		.uav_write              (tse_0_control_port_agent_m0_write),         //                         .write
+		.uav_waitrequest        (tse_0_control_port_agent_m0_waitrequest),   //                         .waitrequest
+		.uav_readdatavalid      (tse_0_control_port_agent_m0_readdatavalid), //                         .readdatavalid
+		.uav_byteenable         (tse_0_control_port_agent_m0_byteenable),    //                         .byteenable
+		.uav_readdata           (tse_0_control_port_agent_m0_readdata),      //                         .readdata
+		.uav_writedata          (tse_0_control_port_agent_m0_writedata),     //                         .writedata
+		.uav_lock               (tse_0_control_port_agent_m0_lock),          //                         .lock
+		.uav_debugaccess        (tse_0_control_port_agent_m0_debugaccess),   //                         .debugaccess
+		.av_address             (tse_0_control_port_address),                //      avalon_anti_slave_0.address
+		.av_write               (tse_0_control_port_write),                  //                         .write
+		.av_read                (tse_0_control_port_read),                   //                         .read
+		.av_readdata            (tse_0_control_port_readdata),               //                         .readdata
+		.av_writedata           (tse_0_control_port_writedata),              //                         .writedata
+		.av_waitrequest         (tse_0_control_port_waitrequest),            //                         .waitrequest
 		.av_begintransfer       (),                                          //              (terminated)
 		.av_beginbursttransfer  (),                                          //              (terminated)
 		.av_burstcount          (),                                          //              (terminated)
@@ -569,26 +569,26 @@ module ethernet_pt_mm_interconnect_0 (
 		.AV_WRITE_WAIT_CYCLES           (1),
 		.AV_SETUP_WAIT_CYCLES           (0),
 		.AV_DATA_HOLD_CYCLES            (0)
-	) tse_0_control_port_translator (
+	) tse_1_control_port_translator (
 		.clk                    (sys_clk_clk_clk),                           //                      clk.clk
 		.reset                  (nios2_reset_reset_bridge_in_reset_reset),   //                    reset.reset
-		.uav_address            (tse_0_control_port_agent_m0_address),       // avalon_universal_slave_0.address
-		.uav_burstcount         (tse_0_control_port_agent_m0_burstcount),    //                         .burstcount
-		.uav_read               (tse_0_control_port_agent_m0_read),          //                         .read
-		.uav_write              (tse_0_control_port_agent_m0_write),         //                         .write
-		.uav_waitrequest        (tse_0_control_port_agent_m0_waitrequest),   //                         .waitrequest
-		.uav_readdatavalid      (tse_0_control_port_agent_m0_readdatavalid), //                         .readdatavalid
-		.uav_byteenable         (tse_0_control_port_agent_m0_byteenable),    //                         .byteenable
-		.uav_readdata           (tse_0_control_port_agent_m0_readdata),      //                         .readdata
-		.uav_writedata          (tse_0_control_port_agent_m0_writedata),     //                         .writedata
-		.uav_lock               (tse_0_control_port_agent_m0_lock),          //                         .lock
-		.uav_debugaccess        (tse_0_control_port_agent_m0_debugaccess),   //                         .debugaccess
-		.av_address             (tse_0_control_port_address),                //      avalon_anti_slave_0.address
-		.av_write               (tse_0_control_port_write),                  //                         .write
-		.av_read                (tse_0_control_port_read),                   //                         .read
-		.av_readdata            (tse_0_control_port_readdata),               //                         .readdata
-		.av_writedata           (tse_0_control_port_writedata),              //                         .writedata
-		.av_waitrequest         (tse_0_control_port_waitrequest),            //                         .waitrequest
+		.uav_address            (tse_1_control_port_agent_m0_address),       // avalon_universal_slave_0.address
+		.uav_burstcount         (tse_1_control_port_agent_m0_burstcount),    //                         .burstcount
+		.uav_read               (tse_1_control_port_agent_m0_read),          //                         .read
+		.uav_write              (tse_1_control_port_agent_m0_write),         //                         .write
+		.uav_waitrequest        (tse_1_control_port_agent_m0_waitrequest),   //                         .waitrequest
+		.uav_readdatavalid      (tse_1_control_port_agent_m0_readdatavalid), //                         .readdatavalid
+		.uav_byteenable         (tse_1_control_port_agent_m0_byteenable),    //                         .byteenable
+		.uav_readdata           (tse_1_control_port_agent_m0_readdata),      //                         .readdata
+		.uav_writedata          (tse_1_control_port_agent_m0_writedata),     //                         .writedata
+		.uav_lock               (tse_1_control_port_agent_m0_lock),          //                         .lock
+		.uav_debugaccess        (tse_1_control_port_agent_m0_debugaccess),   //                         .debugaccess
+		.av_address             (tse_1_control_port_address),                //      avalon_anti_slave_0.address
+		.av_write               (tse_1_control_port_write),                  //                         .write
+		.av_read                (tse_1_control_port_read),                   //                         .read
+		.av_readdata            (tse_1_control_port_readdata),               //                         .readdata
+		.av_writedata           (tse_1_control_port_writedata),              //                         .writedata
+		.av_waitrequest         (tse_1_control_port_waitrequest),            //                         .waitrequest
 		.av_begintransfer       (),                                          //              (terminated)
 		.av_beginbursttransfer  (),                                          //              (terminated)
 		.av_burstcount          (),                                          //              (terminated)
@@ -935,48 +935,48 @@ module ethernet_pt_mm_interconnect_0 (
 		.USE_READRESPONSE          (0),
 		.USE_WRITERESPONSE         (0),
 		.ECC_ENABLE                (0)
-	) tse_1_control_port_agent (
+	) tse_0_control_port_agent (
 		.clk                     (sys_clk_clk_clk),                                     //             clk.clk
 		.reset                   (nios2_reset_reset_bridge_in_reset_reset),             //       clk_reset.reset
-		.m0_address              (tse_1_control_port_agent_m0_address),                 //              m0.address
-		.m0_burstcount           (tse_1_control_port_agent_m0_burstcount),              //                .burstcount
-		.m0_byteenable           (tse_1_control_port_agent_m0_byteenable),              //                .byteenable
-		.m0_debugaccess          (tse_1_control_port_agent_m0_debugaccess),             //                .debugaccess
-		.m0_lock                 (tse_1_control_port_agent_m0_lock),                    //                .lock
-		.m0_readdata             (tse_1_control_port_agent_m0_readdata),                //                .readdata
-		.m0_readdatavalid        (tse_1_control_port_agent_m0_readdatavalid),           //                .readdatavalid
-		.m0_read                 (tse_1_control_port_agent_m0_read),                    //                .read
-		.m0_waitrequest          (tse_1_control_port_agent_m0_waitrequest),             //                .waitrequest
-		.m0_writedata            (tse_1_control_port_agent_m0_writedata),               //                .writedata
-		.m0_write                (tse_1_control_port_agent_m0_write),                   //                .write
-		.rp_endofpacket          (tse_1_control_port_agent_rp_endofpacket),             //              rp.endofpacket
-		.rp_ready                (tse_1_control_port_agent_rp_ready),                   //                .ready
-		.rp_valid                (tse_1_control_port_agent_rp_valid),                   //                .valid
-		.rp_data                 (tse_1_control_port_agent_rp_data),                    //                .data
-		.rp_startofpacket        (tse_1_control_port_agent_rp_startofpacket),           //                .startofpacket
+		.m0_address              (tse_0_control_port_agent_m0_address),                 //              m0.address
+		.m0_burstcount           (tse_0_control_port_agent_m0_burstcount),              //                .burstcount
+		.m0_byteenable           (tse_0_control_port_agent_m0_byteenable),              //                .byteenable
+		.m0_debugaccess          (tse_0_control_port_agent_m0_debugaccess),             //                .debugaccess
+		.m0_lock                 (tse_0_control_port_agent_m0_lock),                    //                .lock
+		.m0_readdata             (tse_0_control_port_agent_m0_readdata),                //                .readdata
+		.m0_readdatavalid        (tse_0_control_port_agent_m0_readdatavalid),           //                .readdatavalid
+		.m0_read                 (tse_0_control_port_agent_m0_read),                    //                .read
+		.m0_waitrequest          (tse_0_control_port_agent_m0_waitrequest),             //                .waitrequest
+		.m0_writedata            (tse_0_control_port_agent_m0_writedata),               //                .writedata
+		.m0_write                (tse_0_control_port_agent_m0_write),                   //                .write
+		.rp_endofpacket          (tse_0_control_port_agent_rp_endofpacket),             //              rp.endofpacket
+		.rp_ready                (tse_0_control_port_agent_rp_ready),                   //                .ready
+		.rp_valid                (tse_0_control_port_agent_rp_valid),                   //                .valid
+		.rp_data                 (tse_0_control_port_agent_rp_data),                    //                .data
+		.rp_startofpacket        (tse_0_control_port_agent_rp_startofpacket),           //                .startofpacket
 		.cp_ready                (cmd_mux_src_ready),                                   //              cp.ready
 		.cp_valid                (cmd_mux_src_valid),                                   //                .valid
 		.cp_data                 (cmd_mux_src_data),                                    //                .data
 		.cp_startofpacket        (cmd_mux_src_startofpacket),                           //                .startofpacket
 		.cp_endofpacket          (cmd_mux_src_endofpacket),                             //                .endofpacket
 		.cp_channel              (cmd_mux_src_channel),                                 //                .channel
-		.rf_sink_ready           (tse_1_control_port_agent_rsp_fifo_out_ready),         //         rf_sink.ready
-		.rf_sink_valid           (tse_1_control_port_agent_rsp_fifo_out_valid),         //                .valid
-		.rf_sink_startofpacket   (tse_1_control_port_agent_rsp_fifo_out_startofpacket), //                .startofpacket
-		.rf_sink_endofpacket     (tse_1_control_port_agent_rsp_fifo_out_endofpacket),   //                .endofpacket
-		.rf_sink_data            (tse_1_control_port_agent_rsp_fifo_out_data),          //                .data
-		.rf_source_ready         (tse_1_control_port_agent_rf_source_ready),            //       rf_source.ready
-		.rf_source_valid         (tse_1_control_port_agent_rf_source_valid),            //                .valid
-		.rf_source_startofpacket (tse_1_control_port_agent_rf_source_startofpacket),    //                .startofpacket
-		.rf_source_endofpacket   (tse_1_control_port_agent_rf_source_endofpacket),      //                .endofpacket
-		.rf_source_data          (tse_1_control_port_agent_rf_source_data),             //                .data
+		.rf_sink_ready           (tse_0_control_port_agent_rsp_fifo_out_ready),         //         rf_sink.ready
+		.rf_sink_valid           (tse_0_control_port_agent_rsp_fifo_out_valid),         //                .valid
+		.rf_sink_startofpacket   (tse_0_control_port_agent_rsp_fifo_out_startofpacket), //                .startofpacket
+		.rf_sink_endofpacket     (tse_0_control_port_agent_rsp_fifo_out_endofpacket),   //                .endofpacket
+		.rf_sink_data            (tse_0_control_port_agent_rsp_fifo_out_data),          //                .data
+		.rf_source_ready         (tse_0_control_port_agent_rf_source_ready),            //       rf_source.ready
+		.rf_source_valid         (tse_0_control_port_agent_rf_source_valid),            //                .valid
+		.rf_source_startofpacket (tse_0_control_port_agent_rf_source_startofpacket),    //                .startofpacket
+		.rf_source_endofpacket   (tse_0_control_port_agent_rf_source_endofpacket),      //                .endofpacket
+		.rf_source_data          (tse_0_control_port_agent_rf_source_data),             //                .data
 		.rdata_fifo_sink_ready   (avalon_st_adapter_out_0_ready),                       // rdata_fifo_sink.ready
 		.rdata_fifo_sink_valid   (avalon_st_adapter_out_0_valid),                       //                .valid
 		.rdata_fifo_sink_data    (avalon_st_adapter_out_0_data),                        //                .data
 		.rdata_fifo_sink_error   (avalon_st_adapter_out_0_error),                       //                .error
-		.rdata_fifo_src_ready    (tse_1_control_port_agent_rdata_fifo_src_ready),       //  rdata_fifo_src.ready
-		.rdata_fifo_src_valid    (tse_1_control_port_agent_rdata_fifo_src_valid),       //                .valid
-		.rdata_fifo_src_data     (tse_1_control_port_agent_rdata_fifo_src_data),        //                .data
+		.rdata_fifo_src_ready    (tse_0_control_port_agent_rdata_fifo_src_ready),       //  rdata_fifo_src.ready
+		.rdata_fifo_src_valid    (tse_0_control_port_agent_rdata_fifo_src_valid),       //                .valid
+		.rdata_fifo_src_data     (tse_0_control_port_agent_rdata_fifo_src_data),        //                .data
 		.m0_response             (2'b00),                                               //     (terminated)
 		.m0_writeresponsevalid   (1'b0)                                                 //     (terminated)
 	);
@@ -994,19 +994,19 @@ module ethernet_pt_mm_interconnect_0 (
 		.USE_STORE_FORWARD   (0),
 		.USE_ALMOST_FULL_IF  (0),
 		.USE_ALMOST_EMPTY_IF (0)
-	) tse_1_control_port_agent_rsp_fifo (
+	) tse_0_control_port_agent_rsp_fifo (
 		.clk               (sys_clk_clk_clk),                                     //       clk.clk
 		.reset             (nios2_reset_reset_bridge_in_reset_reset),             // clk_reset.reset
-		.in_data           (tse_1_control_port_agent_rf_source_data),             //        in.data
-		.in_valid          (tse_1_control_port_agent_rf_source_valid),            //          .valid
-		.in_ready          (tse_1_control_port_agent_rf_source_ready),            //          .ready
-		.in_startofpacket  (tse_1_control_port_agent_rf_source_startofpacket),    //          .startofpacket
-		.in_endofpacket    (tse_1_control_port_agent_rf_source_endofpacket),      //          .endofpacket
-		.out_data          (tse_1_control_port_agent_rsp_fifo_out_data),          //       out.data
-		.out_valid         (tse_1_control_port_agent_rsp_fifo_out_valid),         //          .valid
-		.out_ready         (tse_1_control_port_agent_rsp_fifo_out_ready),         //          .ready
-		.out_startofpacket (tse_1_control_port_agent_rsp_fifo_out_startofpacket), //          .startofpacket
-		.out_endofpacket   (tse_1_control_port_agent_rsp_fifo_out_endofpacket),   //          .endofpacket
+		.in_data           (tse_0_control_port_agent_rf_source_data),             //        in.data
+		.in_valid          (tse_0_control_port_agent_rf_source_valid),            //          .valid
+		.in_ready          (tse_0_control_port_agent_rf_source_ready),            //          .ready
+		.in_startofpacket  (tse_0_control_port_agent_rf_source_startofpacket),    //          .startofpacket
+		.in_endofpacket    (tse_0_control_port_agent_rf_source_endofpacket),      //          .endofpacket
+		.out_data          (tse_0_control_port_agent_rsp_fifo_out_data),          //       out.data
+		.out_valid         (tse_0_control_port_agent_rsp_fifo_out_valid),         //          .valid
+		.out_ready         (tse_0_control_port_agent_rsp_fifo_out_ready),         //          .ready
+		.out_startofpacket (tse_0_control_port_agent_rsp_fifo_out_startofpacket), //          .startofpacket
+		.out_endofpacket   (tse_0_control_port_agent_rsp_fifo_out_endofpacket),   //          .endofpacket
 		.csr_address       (2'b00),                                               // (terminated)
 		.csr_read          (1'b0),                                                // (terminated)
 		.csr_write         (1'b0),                                                // (terminated)
@@ -1060,48 +1060,48 @@ module ethernet_pt_mm_interconnect_0 (
 		.USE_READRESPONSE          (0),
 		.USE_WRITERESPONSE         (0),
 		.ECC_ENABLE                (0)
-	) tse_0_control_port_agent (
+	) tse_1_control_port_agent (
 		.clk                     (sys_clk_clk_clk),                                     //             clk.clk
 		.reset                   (nios2_reset_reset_bridge_in_reset_reset),             //       clk_reset.reset
-		.m0_address              (tse_0_control_port_agent_m0_address),                 //              m0.address
-		.m0_burstcount           (tse_0_control_port_agent_m0_burstcount),              //                .burstcount
-		.m0_byteenable           (tse_0_control_port_agent_m0_byteenable),              //                .byteenable
-		.m0_debugaccess          (tse_0_control_port_agent_m0_debugaccess),             //                .debugaccess
-		.m0_lock                 (tse_0_control_port_agent_m0_lock),                    //                .lock
-		.m0_readdata             (tse_0_control_port_agent_m0_readdata),                //                .readdata
-		.m0_readdatavalid        (tse_0_control_port_agent_m0_readdatavalid),           //                .readdatavalid
-		.m0_read                 (tse_0_control_port_agent_m0_read),                    //                .read
-		.m0_waitrequest          (tse_0_control_port_agent_m0_waitrequest),             //                .waitrequest
-		.m0_writedata            (tse_0_control_port_agent_m0_writedata),               //                .writedata
-		.m0_write                (tse_0_control_port_agent_m0_write),                   //                .write
-		.rp_endofpacket          (tse_0_control_port_agent_rp_endofpacket),             //              rp.endofpacket
-		.rp_ready                (tse_0_control_port_agent_rp_ready),                   //                .ready
-		.rp_valid                (tse_0_control_port_agent_rp_valid),                   //                .valid
-		.rp_data                 (tse_0_control_port_agent_rp_data),                    //                .data
-		.rp_startofpacket        (tse_0_control_port_agent_rp_startofpacket),           //                .startofpacket
+		.m0_address              (tse_1_control_port_agent_m0_address),                 //              m0.address
+		.m0_burstcount           (tse_1_control_port_agent_m0_burstcount),              //                .burstcount
+		.m0_byteenable           (tse_1_control_port_agent_m0_byteenable),              //                .byteenable
+		.m0_debugaccess          (tse_1_control_port_agent_m0_debugaccess),             //                .debugaccess
+		.m0_lock                 (tse_1_control_port_agent_m0_lock),                    //                .lock
+		.m0_readdata             (tse_1_control_port_agent_m0_readdata),                //                .readdata
+		.m0_readdatavalid        (tse_1_control_port_agent_m0_readdatavalid),           //                .readdatavalid
+		.m0_read                 (tse_1_control_port_agent_m0_read),                    //                .read
+		.m0_waitrequest          (tse_1_control_port_agent_m0_waitrequest),             //                .waitrequest
+		.m0_writedata            (tse_1_control_port_agent_m0_writedata),               //                .writedata
+		.m0_write                (tse_1_control_port_agent_m0_write),                   //                .write
+		.rp_endofpacket          (tse_1_control_port_agent_rp_endofpacket),             //              rp.endofpacket
+		.rp_ready                (tse_1_control_port_agent_rp_ready),                   //                .ready
+		.rp_valid                (tse_1_control_port_agent_rp_valid),                   //                .valid
+		.rp_data                 (tse_1_control_port_agent_rp_data),                    //                .data
+		.rp_startofpacket        (tse_1_control_port_agent_rp_startofpacket),           //                .startofpacket
 		.cp_ready                (cmd_mux_001_src_ready),                               //              cp.ready
 		.cp_valid                (cmd_mux_001_src_valid),                               //                .valid
 		.cp_data                 (cmd_mux_001_src_data),                                //                .data
 		.cp_startofpacket        (cmd_mux_001_src_startofpacket),                       //                .startofpacket
 		.cp_endofpacket          (cmd_mux_001_src_endofpacket),                         //                .endofpacket
 		.cp_channel              (cmd_mux_001_src_channel),                             //                .channel
-		.rf_sink_ready           (tse_0_control_port_agent_rsp_fifo_out_ready),         //         rf_sink.ready
-		.rf_sink_valid           (tse_0_control_port_agent_rsp_fifo_out_valid),         //                .valid
-		.rf_sink_startofpacket   (tse_0_control_port_agent_rsp_fifo_out_startofpacket), //                .startofpacket
-		.rf_sink_endofpacket     (tse_0_control_port_agent_rsp_fifo_out_endofpacket),   //                .endofpacket
-		.rf_sink_data            (tse_0_control_port_agent_rsp_fifo_out_data),          //                .data
-		.rf_source_ready         (tse_0_control_port_agent_rf_source_ready),            //       rf_source.ready
-		.rf_source_valid         (tse_0_control_port_agent_rf_source_valid),            //                .valid
-		.rf_source_startofpacket (tse_0_control_port_agent_rf_source_startofpacket),    //                .startofpacket
-		.rf_source_endofpacket   (tse_0_control_port_agent_rf_source_endofpacket),      //                .endofpacket
-		.rf_source_data          (tse_0_control_port_agent_rf_source_data),             //                .data
+		.rf_sink_ready           (tse_1_control_port_agent_rsp_fifo_out_ready),         //         rf_sink.ready
+		.rf_sink_valid           (tse_1_control_port_agent_rsp_fifo_out_valid),         //                .valid
+		.rf_sink_startofpacket   (tse_1_control_port_agent_rsp_fifo_out_startofpacket), //                .startofpacket
+		.rf_sink_endofpacket     (tse_1_control_port_agent_rsp_fifo_out_endofpacket),   //                .endofpacket
+		.rf_sink_data            (tse_1_control_port_agent_rsp_fifo_out_data),          //                .data
+		.rf_source_ready         (tse_1_control_port_agent_rf_source_ready),            //       rf_source.ready
+		.rf_source_valid         (tse_1_control_port_agent_rf_source_valid),            //                .valid
+		.rf_source_startofpacket (tse_1_control_port_agent_rf_source_startofpacket),    //                .startofpacket
+		.rf_source_endofpacket   (tse_1_control_port_agent_rf_source_endofpacket),      //                .endofpacket
+		.rf_source_data          (tse_1_control_port_agent_rf_source_data),             //                .data
 		.rdata_fifo_sink_ready   (avalon_st_adapter_001_out_0_ready),                   // rdata_fifo_sink.ready
 		.rdata_fifo_sink_valid   (avalon_st_adapter_001_out_0_valid),                   //                .valid
 		.rdata_fifo_sink_data    (avalon_st_adapter_001_out_0_data),                    //                .data
 		.rdata_fifo_sink_error   (avalon_st_adapter_001_out_0_error),                   //                .error
-		.rdata_fifo_src_ready    (tse_0_control_port_agent_rdata_fifo_src_ready),       //  rdata_fifo_src.ready
-		.rdata_fifo_src_valid    (tse_0_control_port_agent_rdata_fifo_src_valid),       //                .valid
-		.rdata_fifo_src_data     (tse_0_control_port_agent_rdata_fifo_src_data),        //                .data
+		.rdata_fifo_src_ready    (tse_1_control_port_agent_rdata_fifo_src_ready),       //  rdata_fifo_src.ready
+		.rdata_fifo_src_valid    (tse_1_control_port_agent_rdata_fifo_src_valid),       //                .valid
+		.rdata_fifo_src_data     (tse_1_control_port_agent_rdata_fifo_src_data),        //                .data
 		.m0_response             (2'b00),                                               //     (terminated)
 		.m0_writeresponsevalid   (1'b0)                                                 //     (terminated)
 	);
@@ -1119,19 +1119,19 @@ module ethernet_pt_mm_interconnect_0 (
 		.USE_STORE_FORWARD   (0),
 		.USE_ALMOST_FULL_IF  (0),
 		.USE_ALMOST_EMPTY_IF (0)
-	) tse_0_control_port_agent_rsp_fifo (
+	) tse_1_control_port_agent_rsp_fifo (
 		.clk               (sys_clk_clk_clk),                                     //       clk.clk
 		.reset             (nios2_reset_reset_bridge_in_reset_reset),             // clk_reset.reset
-		.in_data           (tse_0_control_port_agent_rf_source_data),             //        in.data
-		.in_valid          (tse_0_control_port_agent_rf_source_valid),            //          .valid
-		.in_ready          (tse_0_control_port_agent_rf_source_ready),            //          .ready
-		.in_startofpacket  (tse_0_control_port_agent_rf_source_startofpacket),    //          .startofpacket
-		.in_endofpacket    (tse_0_control_port_agent_rf_source_endofpacket),      //          .endofpacket
-		.out_data          (tse_0_control_port_agent_rsp_fifo_out_data),          //       out.data
-		.out_valid         (tse_0_control_port_agent_rsp_fifo_out_valid),         //          .valid
-		.out_ready         (tse_0_control_port_agent_rsp_fifo_out_ready),         //          .ready
-		.out_startofpacket (tse_0_control_port_agent_rsp_fifo_out_startofpacket), //          .startofpacket
-		.out_endofpacket   (tse_0_control_port_agent_rsp_fifo_out_endofpacket),   //          .endofpacket
+		.in_data           (tse_1_control_port_agent_rf_source_data),             //        in.data
+		.in_valid          (tse_1_control_port_agent_rf_source_valid),            //          .valid
+		.in_ready          (tse_1_control_port_agent_rf_source_ready),            //          .ready
+		.in_startofpacket  (tse_1_control_port_agent_rf_source_startofpacket),    //          .startofpacket
+		.in_endofpacket    (tse_1_control_port_agent_rf_source_endofpacket),      //          .endofpacket
+		.out_data          (tse_1_control_port_agent_rsp_fifo_out_data),          //       out.data
+		.out_valid         (tse_1_control_port_agent_rsp_fifo_out_valid),         //          .valid
+		.out_ready         (tse_1_control_port_agent_rsp_fifo_out_ready),         //          .ready
+		.out_startofpacket (tse_1_control_port_agent_rsp_fifo_out_startofpacket), //          .startofpacket
+		.out_endofpacket   (tse_1_control_port_agent_rsp_fifo_out_endofpacket),   //          .endofpacket
 		.csr_address       (2'b00),                                               // (terminated)
 		.csr_read          (1'b0),                                                // (terminated)
 		.csr_write         (1'b0),                                                // (terminated)
@@ -1430,11 +1430,11 @@ module ethernet_pt_mm_interconnect_0 (
 	);
 
 	ethernet_pt_mm_interconnect_0_router_002 router_002 (
-		.sink_ready         (tse_1_control_port_agent_rp_ready),         //      sink.ready
-		.sink_valid         (tse_1_control_port_agent_rp_valid),         //          .valid
-		.sink_data          (tse_1_control_port_agent_rp_data),          //          .data
-		.sink_startofpacket (tse_1_control_port_agent_rp_startofpacket), //          .startofpacket
-		.sink_endofpacket   (tse_1_control_port_agent_rp_endofpacket),   //          .endofpacket
+		.sink_ready         (tse_0_control_port_agent_rp_ready),         //      sink.ready
+		.sink_valid         (tse_0_control_port_agent_rp_valid),         //          .valid
+		.sink_data          (tse_0_control_port_agent_rp_data),          //          .data
+		.sink_startofpacket (tse_0_control_port_agent_rp_startofpacket), //          .startofpacket
+		.sink_endofpacket   (tse_0_control_port_agent_rp_endofpacket),   //          .endofpacket
 		.clk                (sys_clk_clk_clk),                           //       clk.clk
 		.reset              (nios2_reset_reset_bridge_in_reset_reset),   // clk_reset.reset
 		.src_ready          (router_002_src_ready),                      //       src.ready
@@ -1446,11 +1446,11 @@ module ethernet_pt_mm_interconnect_0 (
 	);
 
 	ethernet_pt_mm_interconnect_0_router_002 router_003 (
-		.sink_ready         (tse_0_control_port_agent_rp_ready),         //      sink.ready
-		.sink_valid         (tse_0_control_port_agent_rp_valid),         //          .valid
-		.sink_data          (tse_0_control_port_agent_rp_data),          //          .data
-		.sink_startofpacket (tse_0_control_port_agent_rp_startofpacket), //          .startofpacket
-		.sink_endofpacket   (tse_0_control_port_agent_rp_endofpacket),   //          .endofpacket
+		.sink_ready         (tse_1_control_port_agent_rp_ready),         //      sink.ready
+		.sink_valid         (tse_1_control_port_agent_rp_valid),         //          .valid
+		.sink_data          (tse_1_control_port_agent_rp_data),          //          .data
+		.sink_startofpacket (tse_1_control_port_agent_rp_startofpacket), //          .startofpacket
+		.sink_endofpacket   (tse_1_control_port_agent_rp_endofpacket),   //          .endofpacket
 		.clk                (sys_clk_clk_clk),                           //       clk.clk
 		.reset              (nios2_reset_reset_bridge_in_reset_reset),   // clk_reset.reset
 		.src_ready          (router_003_src_ready),                      //       src.ready
@@ -1789,9 +1789,9 @@ module ethernet_pt_mm_interconnect_0 (
 	) avalon_st_adapter (
 		.in_clk_0_clk   (sys_clk_clk_clk),                               // in_clk_0.clk
 		.in_rst_0_reset (nios2_reset_reset_bridge_in_reset_reset),       // in_rst_0.reset
-		.in_0_data      (tse_1_control_port_agent_rdata_fifo_src_data),  //     in_0.data
-		.in_0_valid     (tse_1_control_port_agent_rdata_fifo_src_valid), //         .valid
-		.in_0_ready     (tse_1_control_port_agent_rdata_fifo_src_ready), //         .ready
+		.in_0_data      (tse_0_control_port_agent_rdata_fifo_src_data),  //     in_0.data
+		.in_0_valid     (tse_0_control_port_agent_rdata_fifo_src_valid), //         .valid
+		.in_0_ready     (tse_0_control_port_agent_rdata_fifo_src_ready), //         .ready
 		.out_0_data     (avalon_st_adapter_out_0_data),                  //    out_0.data
 		.out_0_valid    (avalon_st_adapter_out_0_valid),                 //         .valid
 		.out_0_ready    (avalon_st_adapter_out_0_ready),                 //         .ready
@@ -1818,9 +1818,9 @@ module ethernet_pt_mm_interconnect_0 (
 	) avalon_st_adapter_001 (
 		.in_clk_0_clk   (sys_clk_clk_clk),                               // in_clk_0.clk
 		.in_rst_0_reset (nios2_reset_reset_bridge_in_reset_reset),       // in_rst_0.reset
-		.in_0_data      (tse_0_control_port_agent_rdata_fifo_src_data),  //     in_0.data
-		.in_0_valid     (tse_0_control_port_agent_rdata_fifo_src_valid), //         .valid
-		.in_0_ready     (tse_0_control_port_agent_rdata_fifo_src_ready), //         .ready
+		.in_0_data      (tse_1_control_port_agent_rdata_fifo_src_data),  //     in_0.data
+		.in_0_valid     (tse_1_control_port_agent_rdata_fifo_src_valid), //         .valid
+		.in_0_ready     (tse_1_control_port_agent_rdata_fifo_src_ready), //         .ready
 		.out_0_data     (avalon_st_adapter_001_out_0_data),              //    out_0.data
 		.out_0_valid    (avalon_st_adapter_001_out_0_valid),             //         .valid
 		.out_0_ready    (avalon_st_adapter_001_out_0_ready),             //         .ready

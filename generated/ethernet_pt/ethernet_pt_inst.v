@@ -25,6 +25,13 @@
 		.tse_0_mac_status_connection_ena_10      (<connected-to-tse_0_mac_status_connection_ena_10>),      //                                  .ena_10
 		.tse_0_pcs_mac_rx_clock_connection_clk   (<connected-to-tse_0_pcs_mac_rx_clock_connection_clk>),   // tse_0_pcs_mac_rx_clock_connection.clk
 		.tse_0_pcs_mac_tx_clock_connection_clk   (<connected-to-tse_0_pcs_mac_tx_clock_connection_clk>),   // tse_0_pcs_mac_tx_clock_connection.clk
+		.tse_0_transmit_data                     (<connected-to-tse_0_transmit_data>),                     //                    tse_0_transmit.data
+		.tse_0_transmit_endofpacket              (<connected-to-tse_0_transmit_endofpacket>),              //                                  .endofpacket
+		.tse_0_transmit_error                    (<connected-to-tse_0_transmit_error>),                    //                                  .error
+		.tse_0_transmit_empty                    (<connected-to-tse_0_transmit_empty>),                    //                                  .empty
+		.tse_0_transmit_ready                    (<connected-to-tse_0_transmit_ready>),                    //                                  .ready
+		.tse_0_transmit_startofpacket            (<connected-to-tse_0_transmit_startofpacket>),            //                                  .startofpacket
+		.tse_0_transmit_valid                    (<connected-to-tse_0_transmit_valid>),                    //                                  .valid
 		.tse_1_mac_mdio_connection_mdc           (<connected-to-tse_1_mac_mdio_connection_mdc>),           //         tse_1_mac_mdio_connection.mdc
 		.tse_1_mac_mdio_connection_mdio_in       (<connected-to-tse_1_mac_mdio_connection_mdio_in>),       //                                  .mdio_in
 		.tse_1_mac_mdio_connection_mdio_out      (<connected-to-tse_1_mac_mdio_connection_mdio_out>),      //                                  .mdio_out
@@ -48,6 +55,13 @@
 		.tse_1_mac_status_connection_eth_mode    (<connected-to-tse_1_mac_status_connection_eth_mode>),    //                                  .eth_mode
 		.tse_1_mac_status_connection_ena_10      (<connected-to-tse_1_mac_status_connection_ena_10>),      //                                  .ena_10
 		.tse_1_pcs_mac_rx_clock_connection_clk   (<connected-to-tse_1_pcs_mac_rx_clock_connection_clk>),   // tse_1_pcs_mac_rx_clock_connection.clk
-		.tse_1_pcs_mac_tx_clock_connection_clk   (<connected-to-tse_1_pcs_mac_tx_clock_connection_clk>)    // tse_1_pcs_mac_tx_clock_connection.clk
+		.tse_1_pcs_mac_tx_clock_connection_clk   (<connected-to-tse_1_pcs_mac_tx_clock_connection_clk>),   // tse_1_pcs_mac_tx_clock_connection.clk
+		.tse_1_receive_data                      (<connected-to-tse_1_receive_data>),                      //                     tse_1_receive.data
+		.tse_1_receive_endofpacket               (<connected-to-tse_1_receive_endofpacket>),               //                                  .endofpacket
+		.tse_1_receive_error                     (<connected-to-tse_1_receive_error>),                     //                                  .error
+		.tse_1_receive_empty                     (<connected-to-tse_1_receive_empty>),                     //                                  .empty
+		.tse_1_receive_ready                     (<connected-to-tse_1_receive_ready>),                     //                                  .ready
+		.tse_1_receive_startofpacket             (<connected-to-tse_1_receive_startofpacket>),             //                                  .startofpacket
+		.tse_1_receive_valid                     (<connected-to-tse_1_receive_valid>)                      //                                  .valid
 	);
 

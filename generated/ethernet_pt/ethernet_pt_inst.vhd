@@ -26,6 +26,13 @@
 			tse_0_mac_status_connection_ena_10      : out std_logic;                                        -- ena_10
 			tse_0_pcs_mac_rx_clock_connection_clk   : in  std_logic                     := 'X';             -- clk
 			tse_0_pcs_mac_tx_clock_connection_clk   : in  std_logic                     := 'X';             -- clk
+			tse_0_transmit_data                     : in  std_logic_vector(31 downto 0) := (others => 'X'); -- data
+			tse_0_transmit_endofpacket              : in  std_logic                     := 'X';             -- endofpacket
+			tse_0_transmit_error                    : in  std_logic                     := 'X';             -- error
+			tse_0_transmit_empty                    : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- empty
+			tse_0_transmit_ready                    : out std_logic;                                        -- ready
+			tse_0_transmit_startofpacket            : in  std_logic                     := 'X';             -- startofpacket
+			tse_0_transmit_valid                    : in  std_logic                     := 'X';             -- valid
 			tse_1_mac_mdio_connection_mdc           : out std_logic;                                        -- mdc
 			tse_1_mac_mdio_connection_mdio_in       : in  std_logic                     := 'X';             -- mdio_in
 			tse_1_mac_mdio_connection_mdio_out      : out std_logic;                                        -- mdio_out
@@ -49,7 +56,14 @@
 			tse_1_mac_status_connection_eth_mode    : out std_logic;                                        -- eth_mode
 			tse_1_mac_status_connection_ena_10      : out std_logic;                                        -- ena_10
 			tse_1_pcs_mac_rx_clock_connection_clk   : in  std_logic                     := 'X';             -- clk
-			tse_1_pcs_mac_tx_clock_connection_clk   : in  std_logic                     := 'X'              -- clk
+			tse_1_pcs_mac_tx_clock_connection_clk   : in  std_logic                     := 'X';             -- clk
+			tse_1_receive_data                      : out std_logic_vector(31 downto 0);                    -- data
+			tse_1_receive_endofpacket               : out std_logic;                                        -- endofpacket
+			tse_1_receive_error                     : out std_logic_vector(5 downto 0);                     -- error
+			tse_1_receive_empty                     : out std_logic_vector(1 downto 0);                     -- empty
+			tse_1_receive_ready                     : in  std_logic                     := 'X';             -- ready
+			tse_1_receive_startofpacket             : out std_logic;                                        -- startofpacket
+			tse_1_receive_valid                     : out std_logic                                         -- valid
 		);
 	end component ethernet_pt;
 
@@ -81,6 +95,13 @@
 			tse_0_mac_status_connection_ena_10      => CONNECTED_TO_tse_0_mac_status_connection_ena_10,      --                                  .ena_10
 			tse_0_pcs_mac_rx_clock_connection_clk   => CONNECTED_TO_tse_0_pcs_mac_rx_clock_connection_clk,   -- tse_0_pcs_mac_rx_clock_connection.clk
 			tse_0_pcs_mac_tx_clock_connection_clk   => CONNECTED_TO_tse_0_pcs_mac_tx_clock_connection_clk,   -- tse_0_pcs_mac_tx_clock_connection.clk
+			tse_0_transmit_data                     => CONNECTED_TO_tse_0_transmit_data,                     --                    tse_0_transmit.data
+			tse_0_transmit_endofpacket              => CONNECTED_TO_tse_0_transmit_endofpacket,              --                                  .endofpacket
+			tse_0_transmit_error                    => CONNECTED_TO_tse_0_transmit_error,                    --                                  .error
+			tse_0_transmit_empty                    => CONNECTED_TO_tse_0_transmit_empty,                    --                                  .empty
+			tse_0_transmit_ready                    => CONNECTED_TO_tse_0_transmit_ready,                    --                                  .ready
+			tse_0_transmit_startofpacket            => CONNECTED_TO_tse_0_transmit_startofpacket,            --                                  .startofpacket
+			tse_0_transmit_valid                    => CONNECTED_TO_tse_0_transmit_valid,                    --                                  .valid
 			tse_1_mac_mdio_connection_mdc           => CONNECTED_TO_tse_1_mac_mdio_connection_mdc,           --         tse_1_mac_mdio_connection.mdc
 			tse_1_mac_mdio_connection_mdio_in       => CONNECTED_TO_tse_1_mac_mdio_connection_mdio_in,       --                                  .mdio_in
 			tse_1_mac_mdio_connection_mdio_out      => CONNECTED_TO_tse_1_mac_mdio_connection_mdio_out,      --                                  .mdio_out
@@ -104,6 +125,13 @@
 			tse_1_mac_status_connection_eth_mode    => CONNECTED_TO_tse_1_mac_status_connection_eth_mode,    --                                  .eth_mode
 			tse_1_mac_status_connection_ena_10      => CONNECTED_TO_tse_1_mac_status_connection_ena_10,      --                                  .ena_10
 			tse_1_pcs_mac_rx_clock_connection_clk   => CONNECTED_TO_tse_1_pcs_mac_rx_clock_connection_clk,   -- tse_1_pcs_mac_rx_clock_connection.clk
-			tse_1_pcs_mac_tx_clock_connection_clk   => CONNECTED_TO_tse_1_pcs_mac_tx_clock_connection_clk    -- tse_1_pcs_mac_tx_clock_connection.clk
+			tse_1_pcs_mac_tx_clock_connection_clk   => CONNECTED_TO_tse_1_pcs_mac_tx_clock_connection_clk,   -- tse_1_pcs_mac_tx_clock_connection.clk
+			tse_1_receive_data                      => CONNECTED_TO_tse_1_receive_data,                      --                     tse_1_receive.data
+			tse_1_receive_endofpacket               => CONNECTED_TO_tse_1_receive_endofpacket,               --                                  .endofpacket
+			tse_1_receive_error                     => CONNECTED_TO_tse_1_receive_error,                     --                                  .error
+			tse_1_receive_empty                     => CONNECTED_TO_tse_1_receive_empty,                     --                                  .empty
+			tse_1_receive_ready                     => CONNECTED_TO_tse_1_receive_ready,                     --                                  .ready
+			tse_1_receive_startofpacket             => CONNECTED_TO_tse_1_receive_startofpacket,             --                                  .startofpacket
+			tse_1_receive_valid                     => CONNECTED_TO_tse_1_receive_valid                      --                                  .valid
 		);
 

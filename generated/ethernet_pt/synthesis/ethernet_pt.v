@@ -30,6 +30,13 @@ module ethernet_pt (
 		output wire        tse_0_mac_status_connection_ena_10,      //                                  .ena_10
 		input  wire        tse_0_pcs_mac_rx_clock_connection_clk,   // tse_0_pcs_mac_rx_clock_connection.clk
 		input  wire        tse_0_pcs_mac_tx_clock_connection_clk,   // tse_0_pcs_mac_tx_clock_connection.clk
+		input  wire [31:0] tse_0_transmit_data,                     //                    tse_0_transmit.data
+		input  wire        tse_0_transmit_endofpacket,              //                                  .endofpacket
+		input  wire        tse_0_transmit_error,                    //                                  .error
+		input  wire [1:0]  tse_0_transmit_empty,                    //                                  .empty
+		output wire        tse_0_transmit_ready,                    //                                  .ready
+		input  wire        tse_0_transmit_startofpacket,            //                                  .startofpacket
+		input  wire        tse_0_transmit_valid,                    //                                  .valid
 		output wire        tse_1_mac_mdio_connection_mdc,           //         tse_1_mac_mdio_connection.mdc
 		input  wire        tse_1_mac_mdio_connection_mdio_in,       //                                  .mdio_in
 		output wire        tse_1_mac_mdio_connection_mdio_out,      //                                  .mdio_out
@@ -53,7 +60,14 @@ module ethernet_pt (
 		output wire        tse_1_mac_status_connection_eth_mode,    //                                  .eth_mode
 		output wire        tse_1_mac_status_connection_ena_10,      //                                  .ena_10
 		input  wire        tse_1_pcs_mac_rx_clock_connection_clk,   // tse_1_pcs_mac_rx_clock_connection.clk
-		input  wire        tse_1_pcs_mac_tx_clock_connection_clk    // tse_1_pcs_mac_tx_clock_connection.clk
+		input  wire        tse_1_pcs_mac_tx_clock_connection_clk,   // tse_1_pcs_mac_tx_clock_connection.clk
+		output wire [31:0] tse_1_receive_data,                      //                     tse_1_receive.data
+		output wire        tse_1_receive_endofpacket,               //                                  .endofpacket
+		output wire [5:0]  tse_1_receive_error,                     //                                  .error
+		output wire [1:0]  tse_1_receive_empty,                     //                                  .empty
+		input  wire        tse_1_receive_ready,                     //                                  .ready
+		output wire        tse_1_receive_startofpacket,             //                                  .startofpacket
+		output wire        tse_1_receive_valid                      //                                  .valid
 	);
 
 	wire  [31:0] nios2_data_master_readdata;                          // mm_interconnect_0:nios2_data_master_readdata -> nios2:d_readdata
@@ -68,18 +82,18 @@ module ethernet_pt (
 	wire         nios2_instruction_master_waitrequest;                // mm_interconnect_0:nios2_instruction_master_waitrequest -> nios2:i_waitrequest
 	wire  [12:0] nios2_instruction_master_address;                    // nios2:i_address -> mm_interconnect_0:nios2_instruction_master_address
 	wire         nios2_instruction_master_read;                       // nios2:i_read -> mm_interconnect_0:nios2_instruction_master_read
-	wire  [31:0] mm_interconnect_0_tse_1_control_port_readdata;       // tse_1:reg_data_out -> mm_interconnect_0:tse_1_control_port_readdata
-	wire         mm_interconnect_0_tse_1_control_port_waitrequest;    // tse_1:reg_busy -> mm_interconnect_0:tse_1_control_port_waitrequest
-	wire   [7:0] mm_interconnect_0_tse_1_control_port_address;        // mm_interconnect_0:tse_1_control_port_address -> tse_1:reg_addr
-	wire         mm_interconnect_0_tse_1_control_port_read;           // mm_interconnect_0:tse_1_control_port_read -> tse_1:reg_rd
-	wire         mm_interconnect_0_tse_1_control_port_write;          // mm_interconnect_0:tse_1_control_port_write -> tse_1:reg_wr
-	wire  [31:0] mm_interconnect_0_tse_1_control_port_writedata;      // mm_interconnect_0:tse_1_control_port_writedata -> tse_1:reg_data_in
 	wire  [31:0] mm_interconnect_0_tse_0_control_port_readdata;       // tse_0:reg_data_out -> mm_interconnect_0:tse_0_control_port_readdata
 	wire         mm_interconnect_0_tse_0_control_port_waitrequest;    // tse_0:reg_busy -> mm_interconnect_0:tse_0_control_port_waitrequest
 	wire   [7:0] mm_interconnect_0_tse_0_control_port_address;        // mm_interconnect_0:tse_0_control_port_address -> tse_0:reg_addr
 	wire         mm_interconnect_0_tse_0_control_port_read;           // mm_interconnect_0:tse_0_control_port_read -> tse_0:reg_rd
 	wire         mm_interconnect_0_tse_0_control_port_write;          // mm_interconnect_0:tse_0_control_port_write -> tse_0:reg_wr
 	wire  [31:0] mm_interconnect_0_tse_0_control_port_writedata;      // mm_interconnect_0:tse_0_control_port_writedata -> tse_0:reg_data_in
+	wire  [31:0] mm_interconnect_0_tse_1_control_port_readdata;       // tse_1:reg_data_out -> mm_interconnect_0:tse_1_control_port_readdata
+	wire         mm_interconnect_0_tse_1_control_port_waitrequest;    // tse_1:reg_busy -> mm_interconnect_0:tse_1_control_port_waitrequest
+	wire   [7:0] mm_interconnect_0_tse_1_control_port_address;        // mm_interconnect_0:tse_1_control_port_address -> tse_1:reg_addr
+	wire         mm_interconnect_0_tse_1_control_port_read;           // mm_interconnect_0:tse_1_control_port_read -> tse_1:reg_rd
+	wire         mm_interconnect_0_tse_1_control_port_write;          // mm_interconnect_0:tse_1_control_port_write -> tse_1:reg_wr
+	wire  [31:0] mm_interconnect_0_tse_1_control_port_writedata;      // mm_interconnect_0:tse_1_control_port_writedata -> tse_1:reg_data_in
 	wire  [31:0] mm_interconnect_0_nios2_debug_mem_slave_readdata;    // nios2:debug_mem_slave_readdata -> mm_interconnect_0:nios2_debug_mem_slave_readdata
 	wire         mm_interconnect_0_nios2_debug_mem_slave_waitrequest; // nios2:debug_mem_slave_waitrequest -> mm_interconnect_0:nios2_debug_mem_slave_waitrequest
 	wire         mm_interconnect_0_nios2_debug_mem_slave_debugaccess; // mm_interconnect_0:nios2_debug_mem_slave_debugaccess -> nios2:debug_mem_slave_debugaccess
@@ -110,21 +124,7 @@ module ethernet_pt (
 	wire         avalon_st_adapter_out_0_endofpacket;                 // avalon_st_adapter:out_0_endofpacket -> tse_1:ff_tx_eop
 	wire         avalon_st_adapter_out_0_error;                       // avalon_st_adapter:out_0_error -> tse_1:ff_tx_err
 	wire   [1:0] avalon_st_adapter_out_0_empty;                       // avalon_st_adapter:out_0_empty -> tse_1:ff_tx_mod
-	wire         tse_1_receive_valid;                                 // tse_1:ff_rx_dval -> avalon_st_adapter_001:in_0_valid
-	wire  [31:0] tse_1_receive_data;                                  // tse_1:ff_rx_data -> avalon_st_adapter_001:in_0_data
-	wire         tse_1_receive_ready;                                 // avalon_st_adapter_001:in_0_ready -> tse_1:ff_rx_rdy
-	wire         tse_1_receive_startofpacket;                         // tse_1:ff_rx_sop -> avalon_st_adapter_001:in_0_startofpacket
-	wire         tse_1_receive_endofpacket;                           // tse_1:ff_rx_eop -> avalon_st_adapter_001:in_0_endofpacket
-	wire   [5:0] tse_1_receive_error;                                 // tse_1:rx_err -> avalon_st_adapter_001:in_0_error
-	wire   [1:0] tse_1_receive_empty;                                 // tse_1:ff_rx_mod -> avalon_st_adapter_001:in_0_empty
-	wire         avalon_st_adapter_001_out_0_valid;                   // avalon_st_adapter_001:out_0_valid -> tse_0:ff_tx_wren
-	wire  [31:0] avalon_st_adapter_001_out_0_data;                    // avalon_st_adapter_001:out_0_data -> tse_0:ff_tx_data
-	wire         avalon_st_adapter_001_out_0_ready;                   // tse_0:ff_tx_rdy -> avalon_st_adapter_001:out_0_ready
-	wire         avalon_st_adapter_001_out_0_startofpacket;           // avalon_st_adapter_001:out_0_startofpacket -> tse_0:ff_tx_sop
-	wire         avalon_st_adapter_001_out_0_endofpacket;             // avalon_st_adapter_001:out_0_endofpacket -> tse_0:ff_tx_eop
-	wire         avalon_st_adapter_001_out_0_error;                   // avalon_st_adapter_001:out_0_error -> tse_0:ff_tx_err
-	wire   [1:0] avalon_st_adapter_001_out_0_empty;                   // avalon_st_adapter_001:out_0_empty -> tse_0:ff_tx_mod
-	wire         rst_controller_reset_out_reset;                      // rst_controller:reset_out -> [avalon_st_adapter:in_rst_0_reset, avalon_st_adapter_001:in_rst_0_reset, irq_mapper:reset, mm_interconnect_0:nios2_reset_reset_bridge_in_reset_reset, nios2:reset_n, onchip_memory2_0:reset, rst_translator:in_reset, tse_0:reset, tse_1:reset]
+	wire         rst_controller_reset_out_reset;                      // rst_controller:reset_out -> [avalon_st_adapter:in_rst_0_reset, irq_mapper:reset, mm_interconnect_0:nios2_reset_reset_bridge_in_reset_reset, nios2:reset_n, onchip_memory2_0:reset, rst_translator:in_reset, tse_0:reset, tse_1:reset]
 	wire         rst_controller_reset_out_reset_req;                  // rst_controller:reset_req -> [nios2:reset_req, onchip_memory2_0:reset_req, rst_translator:reset_req_in]
 
 	ethernet_pt_nios2 nios2 (
@@ -198,13 +198,13 @@ module ethernet_pt (
 		.ff_rx_rdy     (tse_0_receive_ready),                              //                              .ready
 		.ff_rx_sop     (tse_0_receive_startofpacket),                      //                              .startofpacket
 		.ff_rx_dval    (tse_0_receive_valid),                              //                              .valid
-		.ff_tx_data    (avalon_st_adapter_001_out_0_data),                 //                      transmit.data
-		.ff_tx_eop     (avalon_st_adapter_001_out_0_endofpacket),          //                              .endofpacket
-		.ff_tx_err     (avalon_st_adapter_001_out_0_error),                //                              .error
-		.ff_tx_mod     (avalon_st_adapter_001_out_0_empty),                //                              .empty
-		.ff_tx_rdy     (avalon_st_adapter_001_out_0_ready),                //                              .ready
-		.ff_tx_sop     (avalon_st_adapter_001_out_0_startofpacket),        //                              .startofpacket
-		.ff_tx_wren    (avalon_st_adapter_001_out_0_valid),                //                              .valid
+		.ff_tx_data    (tse_0_transmit_data),                              //                      transmit.data
+		.ff_tx_eop     (tse_0_transmit_endofpacket),                       //                              .endofpacket
+		.ff_tx_err     (tse_0_transmit_error),                             //                              .error
+		.ff_tx_mod     (tse_0_transmit_empty),                             //                              .empty
+		.ff_tx_rdy     (tse_0_transmit_ready),                             //                              .ready
+		.ff_tx_sop     (tse_0_transmit_startofpacket),                     //                              .startofpacket
+		.ff_tx_wren    (tse_0_transmit_valid),                             //                              .valid
 		.mdc           (tse_0_mac_mdio_connection_mdc),                    //           mac_mdio_connection.mdc
 		.mdio_in       (tse_0_mac_mdio_connection_mdio_in),                //                              .mdio_in
 		.mdio_out      (tse_0_mac_mdio_connection_mdio_out),               //                              .mdio_out
@@ -356,42 +356,6 @@ module ethernet_pt (
 		.out_0_endofpacket   (avalon_st_adapter_out_0_endofpacket),   //         .endofpacket
 		.out_0_empty         (avalon_st_adapter_out_0_empty),         //         .empty
 		.out_0_error         (avalon_st_adapter_out_0_error)          //         .error
-	);
-
-	ethernet_pt_avalon_st_adapter #(
-		.inBitsPerSymbol (8),
-		.inUsePackets    (1),
-		.inDataWidth     (32),
-		.inChannelWidth  (0),
-		.inErrorWidth    (6),
-		.inUseEmptyPort  (1),
-		.inUseValid      (1),
-		.inUseReady      (1),
-		.inReadyLatency  (2),
-		.outDataWidth    (32),
-		.outChannelWidth (0),
-		.outErrorWidth   (1),
-		.outUseEmptyPort (1),
-		.outUseValid     (1),
-		.outUseReady     (1),
-		.outReadyLatency (0)
-	) avalon_st_adapter_001 (
-		.in_clk_0_clk        (clk_clk),                                   // in_clk_0.clk
-		.in_rst_0_reset      (rst_controller_reset_out_reset),            // in_rst_0.reset
-		.in_0_data           (tse_1_receive_data),                        //     in_0.data
-		.in_0_valid          (tse_1_receive_valid),                       //         .valid
-		.in_0_ready          (tse_1_receive_ready),                       //         .ready
-		.in_0_startofpacket  (tse_1_receive_startofpacket),               //         .startofpacket
-		.in_0_endofpacket    (tse_1_receive_endofpacket),                 //         .endofpacket
-		.in_0_empty          (tse_1_receive_empty),                       //         .empty
-		.in_0_error          (tse_1_receive_error),                       //         .error
-		.out_0_data          (avalon_st_adapter_001_out_0_data),          //    out_0.data
-		.out_0_valid         (avalon_st_adapter_001_out_0_valid),         //         .valid
-		.out_0_ready         (avalon_st_adapter_001_out_0_ready),         //         .ready
-		.out_0_startofpacket (avalon_st_adapter_001_out_0_startofpacket), //         .startofpacket
-		.out_0_endofpacket   (avalon_st_adapter_001_out_0_endofpacket),   //         .endofpacket
-		.out_0_empty         (avalon_st_adapter_001_out_0_empty),         //         .empty
-		.out_0_error         (avalon_st_adapter_001_out_0_error)          //         .error
 	);
 
 	altera_reset_controller #(

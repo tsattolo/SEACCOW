@@ -199,13 +199,13 @@ module ethernet_pt_mm_interconnect_0_router
 
     // ( 0x1000 .. 0x1400 )
     if ( {address[RG:PAD1],{PAD1{1'b0}}} == 13'h1000   ) begin
-            src_channel = 4'b0010;
+            src_channel = 4'b0001;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 2;
     end
 
     // ( 0x1400 .. 0x1800 )
     if ( {address[RG:PAD2],{PAD2{1'b0}}} == 13'h1400   ) begin
-            src_channel = 4'b0001;
+            src_channel = 4'b0010;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 3;
     end
 

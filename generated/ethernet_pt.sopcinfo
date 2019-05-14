@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="ethernet_pt" kind="ethernet_pt" version="1.0" fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2019.05.07.14:19:43 -->
+ <!-- 2019.05.14.14:09:41 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1557253183</value>
+  <value>1557857381</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -2494,18 +2494,18 @@ parameters are a RESULT of the module parameters. -->
    </port>
    <memoryBlock>
     <isBridge>false</isBridge>
-    <moduleName>tse_1</moduleName>
-    <slaveName>control_port</slaveName>
-    <name>tse_1.control_port</name>
-    <baseAddress>5120</baseAddress>
-    <span>1024</span>
-   </memoryBlock>
-   <memoryBlock>
-    <isBridge>false</isBridge>
     <moduleName>tse_0</moduleName>
     <slaveName>control_port</slaveName>
     <name>tse_0.control_port</name>
     <baseAddress>4096</baseAddress>
+    <span>1024</span>
+   </memoryBlock>
+   <memoryBlock>
+    <isBridge>false</isBridge>
+    <moduleName>tse_1</moduleName>
+    <slaveName>control_port</slaveName>
+    <name>tse_1.control_port</name>
+    <baseAddress>5120</baseAddress>
     <span>1024</span>
    </memoryBlock>
    <memoryBlock>
@@ -4681,7 +4681,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.RECEIVE_FIFO_DEPTH</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.REGISTER_SHARED</name>
@@ -4693,7 +4693,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TRANSMIT_FIFO_DEPTH</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.USE_MDIO</name>
@@ -4713,11 +4713,11 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.ALTR,rx-fifo-depth</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.ALTR,tx-fifo-depth</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -4790,7 +4790,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="eg_fifo">
    <type>int</type>
-   <value>2048</value>
+   <value>256</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -4798,7 +4798,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ing_fifo">
    <type>int</type>
-   <value>2048</value>
+   <value>256</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -5022,7 +5022,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="eg_addr">
    <type>int</type>
-   <value>11</value>
+   <value>8</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -5030,7 +5030,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ing_addr">
    <type>int</type>
-   <value>11</value>
+   <value>8</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -6511,7 +6511,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.RECEIVE_FIFO_DEPTH</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.REGISTER_SHARED</name>
@@ -6523,7 +6523,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TRANSMIT_FIFO_DEPTH</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.USE_MDIO</name>
@@ -6543,11 +6543,11 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.ALTR,rx-fifo-depth</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.ALTR,tx-fifo-depth</name>
-   <value>2048</value>
+   <value>256</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -6620,7 +6620,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="eg_fifo">
    <type>int</type>
-   <value>2048</value>
+   <value>256</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -6628,7 +6628,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ing_fifo">
    <type>int</type>
-   <value>2048</value>
+   <value>256</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -6852,7 +6852,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="eg_addr">
    <type>int</type>
-   <value>11</value>
+   <value>8</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -6860,7 +6860,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ing_addr">
    <type>int</type>
-   <value>11</value>
+   <value>8</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -8297,57 +8297,6 @@ parameters are a RESULT of the module parameters. -->
   </interface>
  </module>
  <connection
-   name="nios2.data_master/tse_1.control_port"
-   kind="avalon"
-   version="18.1"
-   start="nios2.data_master"
-   end="tse_1.control_port">
-  <parameter name="arbitrationPriority">
-   <type>int</type>
-   <value>1</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="baseAddress">
-   <type>java.math.BigInteger</type>
-   <value>0x1400</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="defaultConnection">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2</startModule>
-  <startConnectionPoint>data_master</startConnectionPoint>
-  <endModule>tse_1</endModule>
-  <endConnectionPoint>control_port</endConnectionPoint>
- </connection>
- <connection
    name="nios2.data_master/tse_0.control_port"
    kind="avalon"
    version="18.1"
@@ -8396,6 +8345,57 @@ parameters are a RESULT of the module parameters. -->
   <startModule>nios2</startModule>
   <startConnectionPoint>data_master</startConnectionPoint>
   <endModule>tse_0</endModule>
+  <endConnectionPoint>control_port</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2.data_master/tse_1.control_port"
+   kind="avalon"
+   version="18.1"
+   start="nios2.data_master"
+   end="tse_1.control_port">
+  <parameter name="arbitrationPriority">
+   <type>int</type>
+   <value>1</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="baseAddress">
+   <type>java.math.BigInteger</type>
+   <value>0x1400</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="defaultConnection">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2</startModule>
+  <startConnectionPoint>data_master</startConnectionPoint>
+  <endModule>tse_1</endModule>
   <endConnectionPoint>control_port</endConnectionPoint>
  </connection>
  <connection
@@ -8627,33 +8627,6 @@ parameters are a RESULT of the module parameters. -->
   <startModule>tse_0</startModule>
   <startConnectionPoint>receive</startConnectionPoint>
   <endModule>tse_1</endModule>
-  <endConnectionPoint>transmit</endConnectionPoint>
- </connection>
- <connection
-   name="tse_1.receive/tse_0.transmit"
-   kind="avalon_streaming"
-   version="18.1"
-   start="tse_1.receive"
-   end="tse_0.transmit">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>tse_1</startModule>
-  <startConnectionPoint>receive</startConnectionPoint>
-  <endModule>tse_0</endModule>
   <endConnectionPoint>transmit</endConnectionPoint>
  </connection>
  <connection
@@ -9133,7 +9106,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>2</instanceCount>
+  <instanceCount>1</instanceCount>
   <name>avalon_streaming</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IConnection</subtype>

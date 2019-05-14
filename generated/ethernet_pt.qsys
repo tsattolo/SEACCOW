@@ -103,7 +103,7 @@
  <parameter name="hideFromIPCatalog" value="false" />
  <parameter name="lockedInterfaceDefinition" value="" />
  <parameter name="maxAdditionalLatency" value="1" />
- <parameter name="projectName" value="seaccow.qpf" />
+ <parameter name="projectName" value="" />
  <parameter name="sopcBorderPoints" value="false" />
  <parameter name="systemHash" value="0" />
  <parameter name="testBenchDutName" value="" />
@@ -154,6 +154,11 @@
    type="clock"
    dir="end" />
  <interface
+   name="tse_0_transmit"
+   internal="tse_0.transmit"
+   type="avalon_streaming"
+   dir="end" />
+ <interface
    name="tse_1_mac_mdio_connection"
    internal="tse_1.mac_mdio_connection"
    type="conduit"
@@ -183,6 +188,11 @@
    internal="tse_1.pcs_mac_tx_clock_connection"
    type="clock"
    dir="end" />
+ <interface
+   name="tse_1_receive"
+   internal="tse_1.receive"
+   type="avalon_streaming"
+   dir="start" />
  <module name="nios2" kind="altera_nios2_gen2" version="18.1" enabled="1">
   <parameter name="AUTO_CLK_CLOCK_DOMAIN" value="1" />
   <parameter name="AUTO_CLK_RESET_DOMAIN" value="1" />
@@ -409,7 +419,7 @@
   <parameter name="XCVR_SET_USER_IDENTIFIER" value="0" />
   <parameter name="core_variation" value="SMALL_MAC_GIGE" />
   <parameter name="deviceFamilyName" value="Cyclone IV E" />
-  <parameter name="eg_addr" value="11" />
+  <parameter name="eg_addr" value="8" />
   <parameter name="ena_hash" value="false" />
   <parameter name="enable_alt_reconfig" value="false" />
   <parameter name="enable_ecc" value="false" />
@@ -428,7 +438,7 @@
   <parameter name="export_pwrdn" value="false" />
   <parameter name="ext_stat_cnt_ena" value="false" />
   <parameter name="ifGMII" value="RGMII" />
-  <parameter name="ing_addr" value="11" />
+  <parameter name="ing_addr" value="8" />
   <parameter name="max_channels" value="1" />
   <parameter name="mdio_clk_div" value="40" />
   <parameter name="nf_phyip_rcfg_enable" value="false" />
@@ -455,7 +465,7 @@
   <parameter name="XCVR_SET_USER_IDENTIFIER" value="0" />
   <parameter name="core_variation" value="SMALL_MAC_GIGE" />
   <parameter name="deviceFamilyName" value="Cyclone IV E" />
-  <parameter name="eg_addr" value="11" />
+  <parameter name="eg_addr" value="8" />
   <parameter name="ena_hash" value="false" />
   <parameter name="enable_alt_reconfig" value="false" />
   <parameter name="enable_ecc" value="false" />
@@ -474,7 +484,7 @@
   <parameter name="export_pwrdn" value="false" />
   <parameter name="ext_stat_cnt_ena" value="false" />
   <parameter name="ifGMII" value="RGMII" />
-  <parameter name="ing_addr" value="11" />
+  <parameter name="ing_addr" value="8" />
   <parameter name="max_channels" value="1" />
   <parameter name="mdio_clk_div" value="40" />
   <parameter name="nf_phyip_rcfg_enable" value="false" />
@@ -495,18 +505,18 @@
    kind="avalon"
    version="18.1"
    start="nios2.data_master"
-   end="tse_1.control_port">
+   end="tse_0.control_port">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x1400" />
+  <parameter name="baseAddress" value="0x1000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
    kind="avalon"
    version="18.1"
    start="nios2.data_master"
-   end="tse_0.control_port">
+   end="tse_1.control_port">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x1000" />
+  <parameter name="baseAddress" value="0x1400" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -550,11 +560,6 @@
    version="18.1"
    start="tse_0.receive"
    end="tse_1.transmit" />
- <connection
-   kind="avalon_streaming"
-   version="18.1"
-   start="tse_1.receive"
-   end="tse_0.transmit" />
  <connection kind="clock" version="18.1" start="sys_clk.clk" end="nios2.clk" />
  <connection
    kind="clock"
