@@ -1,3 +1,6 @@
+`include "global_types.sv"
+import global_types::*;
+
 module seaccow (
     // Clock
     input         CLOCK_50,
@@ -74,6 +77,10 @@ module seaccow (
             .outclock(tx_clk_1),
             .dataout(ENET0_GTX_CLK)
     );
+
+
+    avln_st tx_0(), rx_1();
+    wire [5:0] rx_error; 
 	
     ethernet_pt pt_inst (
         .clk_clk                                (sys_clk),      
@@ -104,6 +111,41 @@ module seaccow (
         .tse_1_mac_mdio_connection_mdio_in      (ENET1_MDIO),   
         .tse_1_mac_mdio_connection_mdio_out     (mdio_out_1),   
         .tse_1_mac_mdio_connection_mdio_oen     (mdio_oen_1),   
+
+	.tse_0_transmit_data            (tx_0.line.data),
+	.tse_0_transmit_startofpacket   (tx_0.line.sop),
+	.tse_0_transmit_endofpacket     (tx_0.line.eop),
+	.tse_0_transmit_empty           (tx_0.line.empty),
+	.tse_0_transmit_error           (0),
+	.tse_0_transmit_ready           (tx_0.ready),
+	.tse_0_transmit_valid           (tx_0.valid),
+
+	.tse_1_receive_data             (rx_1.line.data),
+	.tse_1_receive_endofpacket      (rx_1.line.eop),
+	.tse_1_receive_startofpacket    (rx_1.line.sop),
+	.tse_1_receive_empty            (rx_1.line.empty),
+	.tse_1_receive_error            (rx_error),
+	.tse_1_receive_ready            (rx_1.ready),
+	.tse_1_receive_valid            (rx_1.valid)
+
     );
+
+
+    seaccow_internal si_0(
+            .sys_clk(sys_clk),
+            .reset_n(core_reset_n),
+            .in(rx_1),
+            .out(tx_0)
+    );
+
+    // Error checking
+    reg rx_error_reg;
+    always_ff @(posedge sys_clk or negedge core_reset_n) begin
+        if (~core_reset_n)
+            rx_error_reg <= 0;
+        else if (rx_error[0])
+            rx_error_reg <= 1;
+    end
+    assign LEDR[0] = rx_error_reg;
 
 endmodule

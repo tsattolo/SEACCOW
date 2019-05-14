@@ -25,11 +25,10 @@ void init_eth(volatile unsigned * const base, unsigned phy_offset)
     // Set command-config register
     *(base + 2) |=  1 << 0 |    // Enable Tx
                     1 << 1 |    // Enable Rx
-                    1 << 3 |    // Enable promiscuous mode
-                    1 << 5 |    // Forward CRC
+                    1 << 3 |    // Set speed to gigabit
+                    1 << 4 |    // Enable promiscuous mode
+                    1 << 6 |    // Forward CRC
                     1 << 26;    // Drop error frames
-
-        0x0000005B;	
 
     //Omit CRC32
     *(base + 0x3A) |=  1 << 17;

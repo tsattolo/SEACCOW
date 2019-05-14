@@ -1123,6 +1123,9 @@ set_location_assignment PIN_E10 -to EXT_IO[5]
 set_location_assignment PIN_D9 -to EXT_IO[6]
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
+set_global_assignment -name SEARCH_PATH ./source/hardware/includes
+set_global_assignment -name SEARCH_PATH ./source/hardware
+set_global_assignment -name SYSTEMVERILOG_FILE source/hardware/seaccow_internal.sv
 set_global_assignment -name SYSTEMVERILOG_FILE seaccow.sv
 set_global_assignment -name QIP_FILE generated/ethernet_pt/synthesis/ethernet_pt.qip
 set_global_assignment -name QIP_FILE generated/ddio_out.qip
