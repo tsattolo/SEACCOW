@@ -13,6 +13,16 @@ module seaccow (
     output  [8:0] LEDG,
     output  [17:0] LEDR,
 
+    // HEX
+    output [6:0] HEX0,
+    output [6:0] HEX1,
+    output [6:0] HEX2,
+    output [6:0] HEX3,
+    output [6:0] HEX4,
+    output [6:0] HEX5,
+    output [6:0] HEX6,
+    output [6:0] HEX7,
+
     // Ethernet 0
     output        ENET0_GTX_CLK,
     output        ENET0_MDC,
@@ -112,18 +122,18 @@ module seaccow (
         .tse_1_mac_mdio_connection_mdio_out     (mdio_out_1),   
         .tse_1_mac_mdio_connection_mdio_oen     (mdio_oen_1),   
 
-	.tse_0_transmit_data            (tx_0.line.data),
-	.tse_0_transmit_startofpacket   (tx_0.line.sop),
-	.tse_0_transmit_endofpacket     (tx_0.line.eop),
-	.tse_0_transmit_empty           (tx_0.line.empty),
+	.tse_0_transmit_data            (tx_0.data),
+	.tse_0_transmit_startofpacket   (tx_0.sop),
+	.tse_0_transmit_endofpacket     (tx_0.eop),
+	.tse_0_transmit_empty           (tx_0.empty),
 	.tse_0_transmit_error           (0),
 	.tse_0_transmit_ready           (tx_0.ready),
 	.tse_0_transmit_valid           (tx_0.valid),
 
-	.tse_1_receive_data             (rx_1.line.data),
-	.tse_1_receive_endofpacket      (rx_1.line.eop),
-	.tse_1_receive_startofpacket    (rx_1.line.sop),
-	.tse_1_receive_empty            (rx_1.line.empty),
+	.tse_1_receive_data             (rx_1.data),
+	.tse_1_receive_endofpacket      (rx_1.eop),
+	.tse_1_receive_startofpacket    (rx_1.sop),
+	.tse_1_receive_empty            (rx_1.empty),
 	.tse_1_receive_error            (rx_error),
 	.tse_1_receive_ready            (rx_1.ready),
 	.tse_1_receive_valid            (rx_1.valid)
@@ -131,21 +141,43 @@ module seaccow (
     );
 
 
-    seaccow_internal si_0(
+    seaccow_internal si0(
             .sys_clk(sys_clk),
             .reset_n(core_reset_n),
             .in(rx_1),
-            .out(tx_0)
+            .out(tx_0),
+            .hex_disp('{HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,HEX6,HEX7}),
     );
+
+    /* display_frame d0( */
+    /*         .sys_clk(sys_clk), */
+    /*         .reset_n(core_reset_n), */
+    /*         .in(rx_1), */
+    /*         .out(tx_0), */
+    /*         .hex_disp('{HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,HEX6,HEX7}), */
+    /*         .SW(SW), */
+    /*         .KEY(KEY), */
+    /*         .LEDG(LEDG) */
+    /* ); */
+
 
     // Error checking
     reg rx_error_reg;
+    reg empty_error;
     always_ff @(posedge sys_clk or negedge core_reset_n) begin
-        if (~core_reset_n)
+        if (~core_reset_n) begin
             rx_error_reg <= 0;
-        else if (rx_error[0])
-            rx_error_reg <= 1;
+            empty_error <= 0;
+        end
+        else begin 
+            if (rx_error[0])
+                rx_error_reg <= 1;
+            if (|rx_1.empty & ~rx_1.eop)
+                empty_error <= 1;
+        end
     end
     assign LEDR[0] = rx_error_reg;
+    assign LEDR[1] = empty_error;
+    assign LEDR[2] = ~core_reset_n;
 
 endmodule

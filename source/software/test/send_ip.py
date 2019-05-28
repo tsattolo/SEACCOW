@@ -1,7 +1,7 @@
 from scapy.all import *
 import zlib
 
-packet = Raw(range(256))
+packet = Ether()/IP(dst="1.2.3.4")/TCP()/Raw(range(18))
 hexdump(packet)
 print(hex(zlib.crc32(bytes(packet))))
 sendp(packet, iface="eno1")
