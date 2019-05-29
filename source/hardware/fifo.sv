@@ -27,8 +27,8 @@ module fifo (
     assign out.data  = out_line.data;
     assign out.sop   = out_line.sop;
     assign out.eop   = out_line.eop;
-    assign out.empty = out_line.eop ? out_line.empty : 0;
-    assign out.valid = out_line.eop ? 1 : out_line.empty[0];
+    assign out.empty = out_line.eop ? out_line.empty : '0;
+    assign out.valid = out_line.eop ? '1 : out_line.empty[0];
 
     assign in.ready = out.ready;
 
@@ -41,6 +41,6 @@ module fifo (
     always_ff @(posedge sys_clk) begin
         out_line  <= mem[addr];
         mem[addr] <= in_line;
-        addr <= addr + 1;
+        addr <= addr + '1;
     end
 endmodule

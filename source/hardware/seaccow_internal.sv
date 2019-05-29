@@ -13,25 +13,41 @@ module seaccow_internal (
             .sys_clk(sys_clk),
             .reset_n(reset_n),
             .in(in),
-            .start(ipv4_start)
+            .packet_start(ipv4_start)
     );
 
 
     logic [31:0] ip_header_first_byte;
     logic valid;
 
-    get_field #(32,1,0 ) g0 (
+
+    localparam IP_ID_SIZE = 16;
+    logic [IP_ID_SIZE-1:0] ip_id;
+    get_field #(IP_ID_SIZE,1,0) get_ip_id (
             .sys_clk(sys_clk),
             .reset_n(reset_n),
             .in(in),
             .start(ipv4_start),
-            .field(ip_header_first_byte),
+            .field(ip_id),
+            .valid(valid)
+    );
+    
+    localparam IP_FLAGS_SIZE = 16;
+    logic [IP_FLAGS_SIZE-1:0] ip_flags;
+
+    get_field #(3,1,0) get_ip_flags (
+            .sys_clk(sys_clk),
+            .reset_n(reset_n),
+            .in(in),
+            .start(ipv4_start),
+            .field(ip_flags),
             .valid(valid)
     );
     
 
+
     hex_decoder h0 (
-        .data(ip_header_first_byte),
+        .data(W'(ip_flags)),
         /* .data(W'(ip_header_first_byte)), */
         .disp(hex_disp)
     );
@@ -53,7 +69,8 @@ module count_words(
     input                       reset_n,
     avln_st                     in,
     input                       start,
-    input                       target,
+    input                       stop,
+    input [CNT_SIZE-1:0]        target,
     output                      found
 
 );
@@ -63,8 +80,8 @@ module count_words(
     logic [CNT_SIZE-1:0] count;
     logic [CNT_SIZE-1:0] counter;
 
-    assign count = start ? 0 : counter;
-    assign found = (count == target) & (~done|start);
+    assign count = start ? '0 : counter;
+    assign found = (count == target) & (~done|start) & in.valid;
 
     always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n) begin
@@ -72,8 +89,8 @@ module count_words(
             done <= 1;
         end
         else begin
-            if (start) done <= 1'b0;
-            if (found) done <= 1'b1;
+            if (start) done <= 0;
+            if (stop) done <= 1;
             counter <= count + in.valid;
         end
     end
@@ -92,43 +109,33 @@ module get_field (
     parameter WORD_INDEX = 0;
     parameter OFFSET = 0;
 
-
     localparam CNT_SIZE = max($clog2(WORD_INDEX + 1), 1);
 
-    logic done;
-    logic [CNT_SIZE-1:0] count;
-    logic [CNT_SIZE-1:0] counter;
+    logic found;
 
-    assign count = start ? 0 : counter;
+    count_words #(CNT_SIZE) cw0 (
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .in(in),
+        .start(start),
+        .stop(valid),
+        .target(WORD_INDEX),
+        .found(found)
+    );
 
     always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n) begin
-            counter <= 0;
-            done <= 1;
             valid <= 0;
             field <= 0;
         end
         else begin
-            if (start) done <= 1'b0;
-            
-            if (valid) begin
-                done <= 1'b1;
-                valid <= 1'b0;
+            if (found) begin
+                field <= in.data[W-1-OFFSET-:N_BITS];
+                valid <= 1;
             end
-    
-            if (in.valid) begin
-                if ((count == WORD_INDEX) & (~done|start)) begin
-                    field <= in.data[W-1-OFFSET-:N_BITS];
-                    valid <= 1'b1;
-                end 
-                counter <= count + 1;
-            end
+            if (valid) valid <= 0;
         end
-        
     end
-
-    
-
 endmodule
 
 
@@ -136,7 +143,7 @@ module find_ipv4_start (
     input               sys_clk,
     input               reset_n,
     avln_st             in,
-    output logic        start
+    output logic        packet_start
 );
 
     localparam IPV4_ETHERTYPE = 16'h0800;
@@ -147,44 +154,73 @@ module find_ipv4_start (
     localparam MAX_VLAN_TAGS = 2;
     localparam CNT_SIZE = max($clog2(NO_VLAN_ETHERTYPE_INDEX + MAX_VLAN_TAGS + 1), 1);
 
-    logic done;
-    logic [$clog2(MAX_VLAN_TAGS+1)-1:0] n_vlan_tags;           //  for vlan tags
-    logic [CNT_SIZE-1:0] count;
-    logic [CNT_SIZE-1:0] counter;
+    logic found, packet_start_comb, notfound;
+    logic [$clog2(MAX_VLAN_TAGS+1)-1:0] n_vlan_tags_comb;
+    logic [$clog2(MAX_VLAN_TAGS+1)-1:0] n_vlan_tags;
     logic [CNT_SIZE-1:0] ethertype_index;
 
+    assign ethertype_index = CNT_SIZE'(NO_VLAN_ETHERTYPE_INDEX) + n_vlan_tags;
 
-    assign ethertype_index = NO_VLAN_ETHERTYPE_INDEX + n_vlan_tags;
-    assign count = in.sop ? 0 : counter;
+    count_words #(CNT_SIZE) cw0 (
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .in(in),
+        .start(in.sop),
+        .stop(packet_start_comb|notfound),
+        .target(ethertype_index),
+        .found(found)
+    );
 
-    always_ff @(posedge sys_clk or negedge reset_n) begin
+    always_comb begin
+        notfound = 0;
+        packet_start_comb = 0;
+        n_vlan_tags_comb = n_vlan_tags;
+        if (found) begin
+            case (in.data[2*B-1:0])
+                IPV4_ETHERTYPE:     packet_start_comb = 1;
+                VLAN_ETHERTYPE:     n_vlan_tags_comb = 1;
+                VLAN2_ETHERTYPE:    n_vlan_tags_comb = 2;
+                default:            notfound = 1;
+            endcase
+        end
+    end
+
+    always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n) begin
-            counter <= 0;
-            done <= 1;
-            start <= 0;
+            n_vlan_tags <= 0;
+            packet_start <= 0;
         end
         else begin
-            if (in.sop) done <= 1'b0;
-            if (start) begin
-                done <= 1'b1;
-                start <= 1'b0;
-            end
-
-            if (in.valid) begin
-                if ((count == ethertype_index) & (~done|in.sop)) begin
-                    case (in.data[2*B-1:0])
-                        IPV4_ETHERTYPE:     start <= 1'b1;
-                        VLAN_ETHERTYPE:     n_vlan_tags <= 2'd1;
-                        VLAN2_ETHERTYPE:    n_vlan_tags <= 2'd2;
-                        default:            done <= 1'b1;
-                    endcase
-                end
-                counter <= count + 1;
-            end
+            n_vlan_tags <= n_vlan_tags_comb;
+            packet_start <= packet_start_comb;
         end
-        
     end
+
+/*     always_ff @(posedge sys_clk or negedge reset_n) begin */
+/*         if (~reset_n) begin */
+/*             counter <= 0; */
+/*             done <= 1; */
+/*             start <= 0; */
+/*         end */
+/*         else begin */
+/*             if (in.sop) done <= 1'b0; */
+/*             if (start) begin */
+/*                 done <= 1'b1; */
+/*                 start <= 1'b0; */
+/*             end */
+
+/*             if (in.valid) begin */
+/*                 if ((count == ethertype_index) & (~done|in.sop)) begin */
+/*                     case (in.data[2*B-1:0]) */
+/*                         IPV4_ETHERTYPE:     start <= 1'b1; */
+/*                         VLAN_ETHERTYPE:     n_vlan_tags <= 2'd1; */
+/*                         VLAN2_ETHERTYPE:    n_vlan_tags <= 2'd2; */
+/*                         default:            done <= 1'b1; */
+/*                     endcase */
+/*                 end */
+/*                 counter <= count + 1; */
+/*             end */
+/*         end */
+/*     end */
+
 endmodule
-
-
-

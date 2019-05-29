@@ -89,7 +89,8 @@ module seaccow (
     );
 
 
-    avln_st tx_0(), rx_1();
+    avln_st tx_0();
+    avln_st rx_1();
     wire [5:0] rx_error; 
 	
     ethernet_pt pt_inst (
@@ -146,7 +147,7 @@ module seaccow (
             .reset_n(core_reset_n),
             .in(rx_1),
             .out(tx_0),
-            .hex_disp('{HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,HEX6,HEX7}),
+            .hex_disp('{HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,HEX6,HEX7})
     );
 
     /* display_frame d0( */
