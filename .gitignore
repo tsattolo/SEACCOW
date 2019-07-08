@@ -34,3 +34,5 @@ nios_workspace
 *.srec
 .qsys_edit
 greybox_tmp/
+compute_absrel
+*.blif
