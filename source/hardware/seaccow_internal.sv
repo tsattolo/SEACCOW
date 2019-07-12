@@ -5,7 +5,8 @@ module seaccow_internal (
     input       reset_n,
     avln_st     in,
     avln_st     out,
-    output [6:0] hex_disp [2*BpW]
+    output [6:0] hex_disp [2*BpW],
+    output [8:0]     LEDG
 );
     logic ipv4_start;
 
@@ -18,36 +19,54 @@ module seaccow_internal (
 
 
     logic [31:0] ip_header_first_byte;
-    logic valid;
 
 
     localparam IP_ID_SIZE = 16;
     logic [IP_ID_SIZE-1:0] ip_id;
+    logic ip_id_valid;
     get_field #(IP_ID_SIZE,1,0) get_ip_id (
             .sys_clk(sys_clk),
             .reset_n(reset_n),
             .in(in),
             .start(ipv4_start),
             .field(ip_id),
-            .valid(valid)
+            .valid(ip_id_valid)
     );
     
-    localparam IP_FLAGS_SIZE = 16;
+    localparam IP_FLAGS_SIZE = 3;
     logic [IP_FLAGS_SIZE-1:0] ip_flags;
-
-    get_field #(3,1,0) get_ip_flags (
+    logic ip_flags_valid;
+    get_field #(IP_FLAGS_SIZE,1,0) get_ip_flags (
             .sys_clk(sys_clk),
             .reset_n(reset_n),
             .in(in),
             .start(ipv4_start),
             .field(ip_flags),
-            .valid(valid)
+            .valid(ip_flags_valid)
     );
     
 
+    logic [63:0] bdd_in;
+    always @(posedge sys_clk) begin
+        if (ip_id_valid) begin
+            bdd_in <= {bdd_in[47:32], bdd_in[31:16], bdd_in[15:0], ip_id};
+        end
+    end
+
+    bddX32 bdd0(
+        .in(bdd_in),
+        .out(LEDG[0])
+    );
+
+
+    bddR bdd1(
+        .in(ip_id),
+        .out(LEDG[1])
+    );
+
 
     hex_decoder h0 (
-        .data(W'(ip_flags)),
+        .data(W'(ip_id)),
         /* .data(W'(ip_header_first_byte)), */
         .disp(hex_disp)
     );
@@ -140,7 +159,7 @@ endmodule
 
 
 module find_ipv4_start (
-    input               sys_clk,
+    input               sys_clk, 
     input               reset_n,
     avln_st             in,
     output logic        packet_start

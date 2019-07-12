@@ -36,3 +36,5 @@ nios_workspace
 greybox_tmp/
 compute_absrel
 *.blif
+source/software/relations/rel*x*/
+source/software/relations/*.v
