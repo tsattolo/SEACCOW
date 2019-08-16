@@ -7,19 +7,26 @@ import pdb
 import lzma
 from functools import partial
 import pandas as pd
+import numpy as np
+import argparse
+
+from scipy.stats import entropy
 
 field_size = 16
-xor_rand = True
-whole_carrier = True
 
 
 def main():
-    pcap_folder = sys.argv[1]
-    message = sys.argv[2]
-    iterations = int(sys.argv[3])
-    outfile = sys.argv[4]
-    
-    with open(message, 'rb') as f:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--pcap_folder')
+    parser.add_argument('-m', '--message')
+    parser.add_argument('-i', '--iterations', type=int)
+    parser.add_argument('-o', '--output')
+    parser.add_argument('--xor_rand', action='store_true')
+    parser.add_argument('--whole_carrier', action='store_true')
+
+    args = parser.parse_args()
+
+    with open(args.message, 'rb') as f:
         msg = list(f.read())
     
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
@@ -27,9 +34,9 @@ def main():
 
 
     real_ids = []
-    pcap_files = [pcap_folder + pf for pf in os.listdir(pcap_folder) if pf.endswith('.pcap')]
+    pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
 
-    stop_filter = lambda _: len(real_ids) == iterations*nbits
+    stop_filter = lambda _: len(real_ids) == args.iterations*nbits
     
     sniff(offline=pcap_files, 
          prn=partial(get_ip_id, real_ids), 
@@ -38,29 +45,30 @@ def main():
     
     if not stop_filter:
         new_iterations = len(real_ids) // nbits
-        print('Not enough packet for  %i iterations, doing %i instead' % 
-                (iterations, new_iterations))
+        print('Not enough packet for  %i args.iterations, doing %i instead' % 
+                (args.iterations, new_iterations))
         real_ids = real_ids[:new_iterations*nbits]
-        iterations = new_iterations
+        args.iterations = new_iterations
 
-    real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(iterations)]
+    real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
 
 
     random.seed(17)
 
-    res_dict = {'comp':[], 'rep':[]}
-    for i in range(iterations):
+    res_dict = {'comp':[], 'rep':[], 'ent':[]}
+    for i in range(args.iterations):
         # pdb.set_trace()
-        traces = inject(field_size, real_id_iter[i], bits, xor_rand, whole_carrier)
+        traces = inject(field_size, real_id_iter[i], bits, args.xor_rand, args.whole_carrier)
         res_dict['comp'].append(check_compress(traces))
         res_dict['rep'].append(check_repeat(traces))
+        res_dict['ent'].append(check_entropy(traces))
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
 
     df = pd.concat(df_dict).T
 
-    df.to_pickle(outfile)
+    df.to_pickle(args.output)
 
 
 
@@ -83,6 +91,8 @@ def inject(field_size, carrier, message_bits, xor_rand=False, whole_carrier=Fals
 
         trace  = [((b & mask) | (m ^ xored)).to_bytes(2, byteorder='big') for b, m in zip(carrier, pktm)]
         traces.append(trace)
+
+        print(len(trace))
         # pdb.set_trace()
 
     return traces
@@ -94,6 +104,10 @@ def check_compress(traces):
 
 def check_repeat(traces):
     return [len(set(tr)) / len(tr) for tr in traces]
+
+def check_entropy(traces):
+    dists = [(np.unique(tr, return_counts=True)) for tr in traces]
+    return [entropy(d[1], base=2) for d in dists]
 
     # res.sort()
     # for r in res:
