@@ -15,6 +15,8 @@ from scipy.stats import entropy
 field_size = 16
 
 
+tests = ['comp', 'rep', 'brep', 'ent', 'cov']
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--pcap_folder')
@@ -55,13 +57,15 @@ def main():
 
     random.seed(17)
 
-    res_dict = {'comp':[], 'rep':[], 'ent':[]}
+    res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
         # pdb.set_trace()
         traces = inject(field_size, real_id_iter[i], bits, args.xor_rand, args.whole_carrier)
         res_dict['comp'].append(check_compress(traces))
         res_dict['rep'].append(check_repeat(traces))
+        res_dict['brep'].append(check_byte_repeat(traces))
         res_dict['ent'].append(check_entropy(traces))
+        res_dict['cov'].append(check_covar(traces))
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -89,31 +93,62 @@ def inject(field_size, carrier, message_bits, xor_rand=False, whole_carrier=Fals
         mask = ~((1 << bp) - 1)
         xored = random.getrandbits(bp) if xor_rand and bp > 0 else 0
 
-        trace  = [((b & mask) | (m ^ xored)).to_bytes(2, byteorder='big') for b, m in zip(carrier, pktm)]
+        # trace  = [((b & mask) | (m ^ xored)).to_bytes(2, byteorder='big') for b, m in zip(carrier, pktm)]
+        trace  = [(b & mask) | (m ^ xored) for b, m in zip(carrier, pktm)]
         traces.append(trace)
 
-        print(len(trace))
         # pdb.set_trace()
 
     return traces
 
     
 def check_compress(traces):
-    byte_traces = [b''.join(tr) for tr in traces]
+    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
     return [len(lzma.compress(btr)) / len(btr) for btr in byte_traces]
 
 def check_repeat(traces):
     return [len(set(tr)) / len(tr) for tr in traces]
 
+def check_byte_repeat(traces):
+    mask = (1 << (field_size // 2)) - 1
+    onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
+    return [len(set(tr)) / len(tr) for tr in onebyte_traces]
+
 def check_entropy(traces):
     dists = [(np.unique(tr, return_counts=True)) for tr in traces]
     return [entropy(d[1], base=2) for d in dists]
+
+def check_covar(traces):
+    return [onepass_covar(tr) for tr in traces]
+
+def onepass_covar(tr, d=1):
+    
+    my = C = 0
+    mx = np.mean(tr[:d])
+    for i in range(len(tr) - d):
+        n = i + 1
+        dx = tr[i + d] - mx
+        mx += dx / n
+        my += (tr[i] - my) / n
+        C += dx * (tr[i] - my)
+
+    res = C / (len(tr) - d)
+    return res
 
     # res.sort()
     # for r in res:
     #     print('%s: %f, repeats: %d' % (r[1], r[0], r[2]))
 
-            
+def online_covariance(data1, data2):
+    meanx = meany = C = n = 0
+    for x, y in zip(data1, data2):
+        n += 1
+        dx = x - meanx
+        meanx += dx / n
+        meany += (y - meany) / n
+        C += dx * (y - meany)
+
+    return  C / n
 
 
 
