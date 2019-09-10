@@ -1,0 +1,192 @@
+Min Cohen's D for comp:
+1, 3.081806
+Min Cohen's D for comp:
+1, 3.081806
+Min Cohen's D for comp:
+1, 3.081413
+Min Cohen's D for comp:
+1, 3.081413
+Min Cohen's D for comp:
+1, 2.776178
+Min Cohen's D for comp:
+1, 2.776178
+Min Cohen's D for comp:
+1, 2.777371
+Min Cohen's D for comp:
+1, 2.777371
+Min Cohen's D for comp:
+1, 1.393615
+Min Cohen's D for comp:
+1, 1.393615
+Min Cohen's D for comp:
+1, 1.397254
+Min Cohen's D for comp:
+1, 1.397254
+Min Cohen's D for rep:
+1, 2.542044
+Min Cohen's D for rep:
+1, 2.542044
+Min Cohen's D for rep:
+1, 2.542044
+Min Cohen's D for rep:
+1, 2.542044
+Min Cohen's D for rep:
+1, 2.030980
+Min Cohen's D for rep:
+1, 2.030980
+Min Cohen's D for rep:
+1, 2.030980
+Min Cohen's D for rep:
+1, 2.030980
+Min Cohen's D for rep:
+1, 1.422765
+Min Cohen's D for rep:
+1, 1.422765
+Min Cohen's D for rep:
+1, 1.422765
+Min Cohen's D for rep:
+1, 1.422765
+Min Cohen's D for brep:
+1, 0.000000
+Min Cohen's D for brep:
+1, 0.000000
+Min Cohen's D for brep:
+1, 0.000000
+Min Cohen's D for brep:
+1, 0.000000
+Min Cohen's D for brep:
+1, 1.120969
+Min Cohen's D for brep:
+1, 1.120969
+Min Cohen's D for brep:
+1, 1.120969
+Min Cohen's D for brep:
+1, 1.120969
+Min Cohen's D for brep:
+1, 1.292719
+Min Cohen's D for brep:
+1, 1.292719
+Min Cohen's D for brep:
+1, 1.292075
+Min Cohen's D for brep:
+1, 1.292075
+Min Cohen's D for ent:
+1, 2.189020
+Min Cohen's D for ent:
+1, 2.189020
+Min Cohen's D for ent:
+1, 2.189020
+Min Cohen's D for ent:
+1, 2.189020
+Min Cohen's D for ent:
+1, 1.781098
+Min Cohen's D for ent:
+1, 1.781098
+Min Cohen's D for ent:
+1, 1.781098
+Min Cohen's D for ent:
+1, 1.781098
+Min Cohen's D for ent:
+1, 1.137357
+Min Cohen's D for ent:
+1, 1.137357
+Min Cohen's D for ent:
+1, 1.137357
+Min Cohen's D for ent:
+1, 1.137357
+Min Cohen's D for bent:
+1, 0.087908
+Min Cohen's D for bent:
+1, 0.087908
+Min Cohen's D for bent:
+1, 0.086776
+Min Cohen's D for bent:
+1, 0.086776
+Min Cohen's D for bent:
+1, 0.343849
+Min Cohen's D for bent:
+1, 0.343849
+Min Cohen's D for bent:
+1, 0.343399
+Min Cohen's D for bent:
+1, 0.343399
+Min Cohen's D for bent:
+1, 0.576689
+Min Cohen's D for bent:
+1, 0.576689
+Min Cohen's D for bent:
+1, 0.572959
+Min Cohen's D for bent:
+1, 0.572959
+Min Cohen's D for cov:
+1, 0.000000
+Min Cohen's D for cov:
+1, 0.000000
+Min Cohen's D for cov:
+1, 0.000000
+Min Cohen's D for cov:
+1, 0.000000
+Min Cohen's D for cov:
+1, 0.000026
+Min Cohen's D for cov:
+1, 0.000026
+Min Cohen's D for cov:
+2, 0.000016
+Min Cohen's D for cov:
+1, 0.000021
+Min Cohen's D for cov:
+1, 0.001156
+Min Cohen's D for cov:
+4, 0.000070
+Min Cohen's D for cov:
+3, 0.000567
+Min Cohen's D for cov:
+2, 0.000318
+Min Cohen's D for lz78:
+1, 1.943745
+Min Cohen's D for lz78:
+1, 1.943745
+Min Cohen's D for lz78:
+1, 1.945140
+Min Cohen's D for lz78:
+1, 1.945140
+Min Cohen's D for lz78:
+1, 1.706255
+Min Cohen's D for lz78:
+1, 1.706255
+Min Cohen's D for lz78:
+1, 1.708859
+Min Cohen's D for lz78:
+1, 1.708859
+Min Cohen's D for lz78:
+1, 1.324348
+Min Cohen's D for lz78:
+1, 1.324348
+Min Cohen's D for lz78:
+1, 1.328072
+Min Cohen's D for lz78:
+1, 1.328072
+Min Cohen's D for lz77:
+1, 10.912725
+Min Cohen's D for lz77:
+13, 9.091001
+Min Cohen's D for lz77:
+1, 10.913295
+Min Cohen's D for lz77:
+13, 9.036786
+Min Cohen's D for lz77:
+1, 6.373779
+Min Cohen's D for lz77:
+1, 6.373779
+Min Cohen's D for lz77:
+1, 6.370087
+Min Cohen's D for lz77:
+1, 6.370087
+Min Cohen's D for lz77:
+1, 1.735635
+Min Cohen's D for lz77:
+1, 1.735635
+Min Cohen's D for lz77:
+1, 1.733791
+Min Cohen's D for lz77:
+1, 1.733791

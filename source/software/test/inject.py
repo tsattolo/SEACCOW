@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from scapy.all import *
-import sys
+import sys, os
+
 import random
 import pdb
 import lzma
@@ -9,13 +10,18 @@ from functools import partial
 import pandas as pd
 import numpy as np
 import argparse
+import lz78
+from itertools import chain
+
+sys.path.append(os.path.join(sys.path[0],'lz77','LZ77-Compressor','src'))
+from LZ77 import LZ77Compressor
 
 from scipy.stats import entropy
 
 field_size = 16
 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'cov']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77']
 
 def main():
     parser = argparse.ArgumentParser()
@@ -23,13 +29,16 @@ def main():
     parser.add_argument('-m', '--message')
     parser.add_argument('-i', '--iterations', type=int)
     parser.add_argument('-o', '--output')
+    parser.add_argument('-n', '--nbits', type=int, default=1000)
     parser.add_argument('--xor_rand', action='store_true')
     parser.add_argument('--whole_carrier', action='store_true')
+    parser.add_argument('--rand_loc', action='store_true')
+    parser.add_argument('--eq_space', action='store_true')
 
     args = parser.parse_args()
 
     with open(args.message, 'rb') as f:
-        msg = list(f.read())
+        msg = list(f.read(args.nbits))
     
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
@@ -60,12 +69,16 @@ def main():
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
         # pdb.set_trace()
-        traces = inject(field_size, real_id_iter[i], bits, args.xor_rand, args.whole_carrier)
+        traces = inject(field_size, real_id_iter[i], bits,
+                        args.xor_rand, args.whole_carrier, args.rand_loc, args.eq_space)
         res_dict['comp'].append(check_compress(traces))
         res_dict['rep'].append(check_repeat(traces))
         res_dict['brep'].append(check_byte_repeat(traces))
         res_dict['ent'].append(check_entropy(traces))
         res_dict['cov'].append(check_covar(traces))
+        res_dict['bent'].append(check_byte_entropy(traces))
+        res_dict['lz78'].append(check_lz78_compress(traces))
+        res_dict['lz77'].append(check_lz77_compress(traces))
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -80,15 +93,22 @@ def main():
 
 
     
-def inject(field_size, carrier, message_bits, xor_rand=False, whole_carrier=False):
+def inject(field_size, carrier, message_bits, 
+           xor_rand=False, whole_carrier=False, rand_loc=False, eq_space=False):
     # bls = []
     traces = []
     for bp in range(field_size + 1):
         
         pktm = get_pktm(message_bits, bp) if not bp == 0 else []
         
-        if whole_carrier or bp == 0:
+        if (whole_carrier and not eq_space)  or bp == 0:
             pktm.extend([0] * (len(carrier) - len(pktm)))
+        elif eq_space:
+            pktm = list(chain(*[[e] + [0]*(bp -1) for e in pktm]))
+        
+        if rand_loc:
+            random.shuffle(pktm)
+        
         
         mask = ~((1 << bp) - 1)
         xored = random.getrandbits(bp) if xor_rand and bp > 0 else 0
@@ -106,6 +126,23 @@ def check_compress(traces):
     byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
     return [len(lzma.compress(btr)) / len(btr) for btr in byte_traces]
 
+def check_lz78_compress(traces):
+    # mask = (1 << (field_size // 2)) - 1
+    # pdb.set_trace()
+    # byte_traces = [''.join([chr(e & mask) + chr (e & ~mask) for e in tr]) for tr in traces]
+    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
+    return [len(lz78.compress(btr)) / len(btr) for btr in byte_traces]
+
+def check_lz77_compress(traces):
+    # mask = (1 << (field_size // 2)) - 1
+    # pdb.set_trace()
+    # byte_traces = [''.join([chr(e & mask) + chr (e & ~mask) for e in tr]) for tr in traces]
+    lz77_compressor = LZ77Compressor() 
+    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
+    return [len(lz77_compressor.compress(btr)) / len(btr) for btr in byte_traces]
+
+
+
 def check_repeat(traces):
     return [len(set(tr)) / len(tr) for tr in traces]
 
@@ -114,8 +151,15 @@ def check_byte_repeat(traces):
     onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
     return [len(set(tr)) / len(tr) for tr in onebyte_traces]
 
-def check_entropy(traces):
+def check_entropy(traces, nb=field_size):
+    mask = (1 << (nb //2)) - 1
     dists = [(np.unique(tr, return_counts=True)) for tr in traces]
+    return [entropy(d[1], base=2) for d in dists]
+
+def check_byte_entropy(traces):
+    mask = (1 << (field_size // 2)) - 1
+    onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
+    dists = [(np.unique(tr, return_counts=True)) for tr in onebyte_traces]
     return [entropy(d[1], base=2) for d in dists]
 
 def check_covar(traces):
@@ -166,9 +210,6 @@ def get_ip_id(ids, pkt):
     if IP in pkt:
         ids.append(pkt['IP'].fields['id'])
 
-
-    
-    
 
     
     
