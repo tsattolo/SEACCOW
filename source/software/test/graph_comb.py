@@ -38,7 +38,7 @@ def main():
                 
                 # plt.savefig('%.eps' %  t) 
                 plt.savefig('combtests/%d_%s_%s.png' %  (nb, t, ct)) 
-                plt.savefig('combtests/%d_%s_%s.eps' %  (nb, t, ct)) 
+                plt.savefig('combtests/%d_%s_%s.pdf' %  (nb, t, ct)) 
 
                 # pdb.set_trace()
 
