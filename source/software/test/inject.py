@@ -54,9 +54,9 @@ def main():
          store=0, 
          stop_filter= stop_filter)
     
-    if not stop_filter:
+    if not stop_filter(None):
         new_iterations = len(real_ids) // nbits
-        print('Not enough packet for  %i args.iterations, doing %i instead' % 
+        print('Not enough packet for  %i iterations, doing %i instead' % 
                 (args.iterations, new_iterations))
         real_ids = real_ids[:new_iterations*nbits]
         args.iterations = new_iterations

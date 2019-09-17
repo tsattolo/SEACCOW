@@ -5,7 +5,6 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
-import seaborn
 
 tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77']
 
@@ -53,6 +52,8 @@ def main():
             plt.xticks(dfnz.columns)
             # plt.legend()
             plt.ylim(0,20)
+            plt.xlabel('Bits / Element')
+            plt.ylabel('Effect Size')
 
         
         plt.savefig('testplots/%s.pdf' %  t) 
