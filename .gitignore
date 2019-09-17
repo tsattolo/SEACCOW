@@ -38,3 +38,4 @@ compute_absrel
 *.blif
 source/software/relations/rel*x*/
 source/software/relations/*.v
+pcap/
