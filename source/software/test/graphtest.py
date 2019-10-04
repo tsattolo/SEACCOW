@@ -6,25 +6,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
 
 def main():
     # df_files = ['testsWC.df', 'testsEQWC.df', 'testsXRWC.df', 'testsEQXRWC.df']
-    # df_files = ['testsWC10b.df']
-    df_files = [
-                'tests1000WC.df',
-                'tests1000EQWC.df',
-                'tests1000XRWC.df',
-                'tests1000EQXRWC.df',
-                'tests100WC.df',
-                'tests100EQWC.df',
-                'tests100XRWC.df',
-                'tests100EQXRWC.df',
-                'tests10WC.df',
-                'tests10EQWC.df',
-                'tests10XRWC.df',
-                'tests10EQXRWC.df',
-                ]
+    df_files = ['testswSDT.df']
+
+    # df_files = [
+    #             'tests1000WC.df',
+    #             'tests1000EQWC.df',
+    #             'tests1000XRWC.df',
+    #             'tests1000EQXRWC.df',
+    #             'tests100WC.df',
+    #             'tests100EQWC.df',
+    #             'tests100XRWC.df',
+    #             'tests100EQXRWC.df',
+    #             'tests10WC.df',
+    #             'tests10EQWC.df',
+    #             'tests10XRWC.df',
+    #             'tests10EQXRWC.df',
+    #             ]
 
     df_list = [pd.read_pickle(e) for e in df_files]
     styles = ['b.', 'r.', 'g.', 'y.'] + ['bx', 'rx', 'gx', 'yx'] + ['b+', 'r+', 'g+', 'y+']

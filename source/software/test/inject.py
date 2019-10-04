@@ -12,16 +12,16 @@ import numpy as np
 import argparse
 import lz78
 from itertools import chain
+from scipy import stats
 
 sys.path.append(os.path.join(sys.path[0],'lz77','LZ77-Compressor','src'))
 from LZ77 import LZ77Compressor
 
-from scipy.stats import entropy
-
 field_size = 16
 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ def main():
     parser.add_argument('-m', '--message')
     parser.add_argument('-i', '--iterations', type=int)
     parser.add_argument('-o', '--output')
-    parser.add_argument('-n', '--nbits', type=int, default=1000)
+    parser.add_argument('-n', '--nbytes', type=int, default=1000)
     parser.add_argument('--xor_rand', action='store_true')
     parser.add_argument('--whole_carrier', action='store_true')
     parser.add_argument('--rand_loc', action='store_true')
@@ -38,7 +38,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.message, 'rb') as f:
-        msg = list(f.read(args.nbits))
+        msg = list(f.read(args.nbytes))
     
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
@@ -47,7 +47,7 @@ def main():
     real_ids = []
     pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
 
-    stop_filter = lambda _: len(real_ids) == args.iterations*nbits
+    stop_filter = lambda _: len(real_ids) == args.iterations*nbits*2
     
     sniff(offline=pcap_files, 
          prn=partial(get_ip_id, real_ids), 
@@ -55,13 +55,21 @@ def main():
          stop_filter= stop_filter)
     
     if not stop_filter(None):
-        new_iterations = len(real_ids) // nbits
-        print('Not enough packet for  %i iterations, doing %i instead' % 
-                (args.iterations, new_iterations))
-        real_ids = real_ids[:new_iterations*nbits]
-        args.iterations = new_iterations
+        pdb.set_trace()
+        # new_iterations = len(real_ids) // nbits
+        # print('Not enough packet for  %i iterations, doing %i instead' % 
+        #         (args.iterations, new_iterations))
+        # real_ids = real_ids[:new_iterations*nbits]
+        # args.iterations = new_iterations
 
     real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
+    dummy_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations, 2*args.iterations)]
+
+    np.random.shuffle(real_id_iter)
+    np.random.shuffle(dummy_id_iter)
+
+    # np.seterr(all='call')
+    # np.seterrcall(pdb.set_trace)
 
 
     random.seed(17)
@@ -79,6 +87,10 @@ def main():
         res_dict['bent'].append(check_byte_entropy(traces))
         res_dict['lz78'].append(check_lz78_compress(traces))
         res_dict['lz77'].append(check_lz77_compress(traces))
+        res_dict['ks'].append(check_ks(traces, dummy_id_iter[i]))
+        res_dict['wcx'].append(check_wilcoxon(traces, dummy_id_iter[i]))
+        res_dict['spr'].append(check_spearman(traces, dummy_id_iter[i]))
+        res_dict['reg'].append(check_regularity(traces))
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -154,13 +166,13 @@ def check_byte_repeat(traces):
 def check_entropy(traces, nb=field_size):
     mask = (1 << (nb //2)) - 1
     dists = [(np.unique(tr, return_counts=True)) for tr in traces]
-    return [entropy(d[1], base=2) for d in dists]
+    return [stats.entropy(d[1], base=2) for d in dists]
 
 def check_byte_entropy(traces):
     mask = (1 << (field_size // 2)) - 1
     onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
     dists = [(np.unique(tr, return_counts=True)) for tr in onebyte_traces]
-    return [entropy(d[1], base=2) for d in dists]
+    return [stats.entropy(d[1], base=2) for d in dists]
 
 def check_covar(traces):
     return [onepass_covar(tr) for tr in traces]
@@ -193,6 +205,44 @@ def online_covariance(data1, data2):
         C += dx * (y - meany)
 
     return  C / n
+
+
+def check_wilcoxon(traces, dummy_carrier):
+    return [stats.wilcoxon(tr, dummy_carrier)[0] for tr in traces]
+
+
+def check_spearman(traces, dummy_carrier):
+    return [stats.spearmanr(tr, dummy_carrier)[0] for tr in traces]
+
+def check_ks(traces, dummy_carrier):
+    return [stats.ks_2samp(tr, dummy_carrier)[0] for tr in traces]
+
+
+def check_regularity(traces):
+    return [regularity(tr) for tr in traces]
+
+
+def regularity(tr):
+    n = int(np.ceil(np.sqrt(len(tr))))
+    ll = [tr[i:i + n] for i in range(0, len(tr), n)]
+    stds = [np.std(l) for l in ll]
+    combs = []
+    for j in range(len(stds)):
+        for i in range(j):
+            combs.append(np.abs(stds[i] - stds[j]) / stds[i])
+    return np.std(combs)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

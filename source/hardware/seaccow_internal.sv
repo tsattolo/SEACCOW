@@ -11,10 +11,10 @@ module seaccow_internal (
     logic ipv4_start;
 
     find_ipv4_start fip0 (
-            .sys_clk(sys_clk),
-            .reset_n(reset_n),
-            .in(in),
-            .packet_start(ipv4_start)
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .in(in),
+        .packet_start(ipv4_start)
     );
 
 
@@ -25,58 +25,50 @@ module seaccow_internal (
     logic [IP_ID_SIZE-1:0] ip_id;
     logic ip_id_valid;
     get_field #(IP_ID_SIZE,1,0) get_ip_id (
-            .sys_clk(sys_clk),
-            .reset_n(reset_n),
-            .in(in),
-            .start(ipv4_start),
-            .field(ip_id),
-            .valid(ip_id_valid)
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .in(in),
+        .start(ipv4_start),
+        .field(ip_id),
+        .valid(ip_id_valid)
     );
     
+    logic ip_id_rep_ready;
+    logic [IP_ID_SIZE-1:0] ip_id_rep;
+    repetition #(IP_ID_SIZE) rep0(
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .clear(0),
+        .valid(ip_id_valid),
+        .field(ip_id),
+        .rep_rate(ip_id_rep),
+        .ready(ip_id_rep_ready)
+    );
+
+
     localparam IP_FLAGS_SIZE = 3;
     logic [IP_FLAGS_SIZE-1:0] ip_flags;
     logic ip_flags_valid;
     get_field #(IP_FLAGS_SIZE,1,0) get_ip_flags (
-            .sys_clk(sys_clk),
-            .reset_n(reset_n),
-            .in(in),
-            .start(ipv4_start),
-            .field(ip_flags),
-            .valid(ip_flags_valid)
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .in(in),
+        .start(ipv4_start),
+        .field(ip_flags),
+        .valid(ip_flags_valid)
     );
     
 
-    logic [63:0] bdd_in;
-    always @(posedge sys_clk) begin
-        if (ip_id_valid) begin
-            bdd_in <= {bdd_in[47:32], bdd_in[31:16], bdd_in[15:0], ip_id};
-        end
-    end
-
-    bddX32 bdd0(
-        .in(bdd_in),
-        .out(LEDG[0])
-    );
-
-
-    bddR bdd1(
-        .in(ip_id),
-        .out(LEDG[1])
-    );
-
-
     hex_decoder h0 (
-        .data(W'(ip_id)),
-        /* .data(W'(ip_header_first_byte)), */
+        .data(ip_id_rep),
         .disp(hex_disp)
     );
     
     
-    
     fifo f0 (
-            .sys_clk(sys_clk),
-            .in(in),
-            .out(out)
+        .sys_clk(sys_clk),
+        .in(in),
+        .out(out)
     );
 
 
