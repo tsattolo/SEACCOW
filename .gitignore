@@ -39,3 +39,4 @@ compute_absrel
 source/software/relations/rel*x*/
 source/software/relations/*.v
 pcap/
+*.pyc

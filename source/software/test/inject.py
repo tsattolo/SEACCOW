@@ -15,12 +15,14 @@ from itertools import chain
 from scipy import stats
 
 sys.path.append(os.path.join(sys.path[0],'lz77','LZ77-Compressor','src'))
-from LZ77 import LZ77Compressor
+# from LZ77 import LZ77Compressor
 
 field_size = 16
 
+# lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'ks', 'wcx', 'spr', 'reg']
+# tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
 
 
 def main():
@@ -79,18 +81,18 @@ def main():
         # pdb.set_trace()
         traces = inject(field_size, real_id_iter[i], bits,
                         args.xor_rand, args.whole_carrier, args.rand_loc, args.eq_space)
-        res_dict['comp'].append(check_compress(traces))
-        res_dict['rep'].append(check_repeat(traces))
-        res_dict['brep'].append(check_byte_repeat(traces))
-        res_dict['ent'].append(check_entropy(traces))
-        res_dict['cov'].append(check_covar(traces))
-        res_dict['bent'].append(check_byte_entropy(traces))
-        res_dict['lz78'].append(check_lz78_compress(traces))
-        res_dict['lz77'].append(check_lz77_compress(traces))
-        res_dict['ks'].append(check_ks(traces, dummy_id_iter[i]))
-        res_dict['wcx'].append(check_wilcoxon(traces, dummy_id_iter[i]))
-        res_dict['spr'].append(check_spearman(traces, dummy_id_iter[i]))
-        res_dict['reg'].append(check_regularity(traces))
+        add_test(res_dict, 'comp', check_compress, traces)
+        add_test(res_dict, 'rep', check_repeat, traces)
+        add_test(res_dict, 'brep', check_byte_repeat, traces)
+        add_test(res_dict, 'ent', check_entropy, traces)
+        add_test(res_dict, 'cov', check_covar, traces)
+        add_test(res_dict, 'bent', check_byte_entropy, traces)
+        add_test(res_dict, 'lz78', check_lz78_compress, traces)
+        # add_test(res_dict, 'lz77', check_lz77_compress, traces)
+        add_test(res_dict, 'ks', check_ks, traces, dummy_id_iter[i])
+        add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
+        add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
+        add_test(res_dict, 'reg', check_regularity, traces)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -133,93 +135,61 @@ def inject(field_size, carrier, message_bits,
 
     return traces
 
+def add_test(res_dict, key, func, traces, *args):
+    res_dict[key].append([func(trace, *args) for trace in traces])
+    return
     
-def check_compress(traces):
-    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
-    return [len(lzma.compress(btr)) / len(btr) for btr in byte_traces]
-
-def check_lz78_compress(traces):
-    # mask = (1 << (field_size // 2)) - 1
-    # pdb.set_trace()
-    # byte_traces = [''.join([chr(e & mask) + chr (e & ~mask) for e in tr]) for tr in traces]
-    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
-    return [len(lz78.compress(btr)) / len(btr) for btr in byte_traces]
-
-def check_lz77_compress(traces):
-    # mask = (1 << (field_size // 2)) - 1
-    # pdb.set_trace()
-    # byte_traces = [''.join([chr(e & mask) + chr (e & ~mask) for e in tr]) for tr in traces]
-    lz77_compressor = LZ77Compressor() 
-    byte_traces = [b''.join([e.to_bytes(2, byteorder='big') for e in tr]) for tr in traces]
-    return [len(lz77_compressor.compress(btr)) / len(btr) for btr in byte_traces]
 
 
 
-def check_repeat(traces):
-    return [len(set(tr)) / len(tr) for tr in traces]
-
-def check_byte_repeat(traces):
-    mask = (1 << (field_size // 2)) - 1
-    onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
-    return [len(set(tr)) / len(tr) for tr in onebyte_traces]
-
-def check_entropy(traces, nb=field_size):
-    mask = (1 << (nb //2)) - 1
-    dists = [(np.unique(tr, return_counts=True)) for tr in traces]
-    return [stats.entropy(d[1], base=2) for d in dists]
-
-def check_byte_entropy(traces):
-    mask = (1 << (field_size // 2)) - 1
-    onebyte_traces = [ [e & mask for e in tr] + [e & ~mask for e in tr] for tr in traces] 
-    dists = [(np.unique(tr, return_counts=True)) for tr in onebyte_traces]
-    return [stats.entropy(d[1], base=2) for d in dists]
-
-def check_covar(traces):
-    return [onepass_covar(tr) for tr in traces]
-
-def onepass_covar(tr, d=1):
     
-    my = C = 0
-    mx = np.mean(tr[:d])
-    for i in range(len(tr) - d):
-        n = i + 1
-        dx = tr[i + d] - mx
-        mx += dx / n
-        my += (tr[i] - my) / n
-        C += dx * (tr[i] - my)
+def check_compress(trace):
+    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+    return len(lzma.compress(btr)) / len(btr)
 
-    res = C / (len(tr) - d)
-    return res
+def check_lz78_compress(trace):
+    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+    return len(lz78.compress(btr)) / len(btr)
 
-    # res.sort()
-    # for r in res:
-    #     print('%s: %f, repeats: %d' % (r[1], r[0], r[2]))
+def check_lz77_compress(trace):
+    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+    return len(lz77.compress(btr)) / len(btr)
 
-def online_covariance(data1, data2):
-    meanx = meany = C = n = 0
-    for x, y in zip(data1, data2):
-        n += 1
-        dx = x - meanx
-        meanx += dx / n
-        meany += (y - meany) / n
-        C += dx * (y - meany)
+def check_repeat(trace):
+    return len(set(trace)) / len(trace)
 
-    return  C / n
+def check_byte_repeat(trace):
+    mask = (1 << (field_size // 2)) - 1
+    ob_trace = [e & mask for e in trace] + [e & ~mask for e in trace]
+    return len(set(ob_trace)) / len(ob_trace)
 
+def check_entropy(trace, nb=field_size):
+    _, dist = np.unique(trace, return_counts=True)
+    return stats.entropy(dist, base=2)
 
-def check_wilcoxon(traces, dummy_carrier):
-    return [stats.wilcoxon(tr, dummy_carrier)[0] for tr in traces]
+def check_byte_entropy(trace):
+    mask = (1 << (field_size // 2)) - 1
+    ob_trace = [e & mask for e in trace] + [e & ~mask for e in trace]
+    _ , dist = np.unique(ob_trace, return_counts=True)
+    return stats.entropy(dist, base=2)
 
-
-def check_spearman(traces, dummy_carrier):
-    return [stats.spearmanr(tr, dummy_carrier)[0] for tr in traces]
-
-def check_ks(traces, dummy_carrier):
-    return [stats.ks_2samp(tr, dummy_carrier)[0] for tr in traces]
+def check_covar(trace):
+    return onepass_covar(trace)
 
 
-def check_regularity(traces):
-    return [regularity(tr) for tr in traces]
+def check_wilcoxon(trace, dummy_carrier):
+    return stats.wilcoxon(trace, dummy_carrier)[0]
+
+
+def check_spearman(trace, dummy_carrier):
+    return stats.spearmanr(trace, dummy_carrier)[0]
+
+def check_ks(trace, dummy_carrier):
+    return stats.ks_2samp(trace, dummy_carrier)[0]
+
+
+def check_regularity(trace):
+    return regularity(trace)
 
 
 def regularity(tr):
@@ -232,24 +202,27 @@ def regularity(tr):
             combs.append(np.abs(stds[i] - stds[j]) / stds[i])
     return np.std(combs)
 
+def onepass_covar(tr, d=1):
+    my = C = 0
+    mx = np.mean(tr[:d])
+    for i in range(len(tr) - d):
+        n = i + 1
+        dx = tr[i + d] - mx
+        mx += dx / n
+        my += (tr[i] - my) / n
+        C += dx * (tr[i] - my)
+    res = C / (len(tr) - d)
+    return res
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def online_covariance(data1, data2):
+    meanx = meany = C = n = 0
+    for x, y in zip(data1, data2):
+        n += 1
+        dx = x - meanx
+        meanx += dx / n
+        meany += (y - meany) / n
+        C += dx * (y - meany)
+    return  C / n
 
 def get_pktm(bits, bits_per): 
     pktb = [bits[i:i+bits_per] for i in range(0, len(bits), bits_per)]
@@ -259,11 +232,6 @@ def get_pktm(bits, bits_per):
 def get_ip_id(ids, pkt):
     if IP in pkt:
         ids.append(pkt['IP'].fields['id'])
-
-
-    
-    
-
 
 if __name__ == "__main__":
     main()
