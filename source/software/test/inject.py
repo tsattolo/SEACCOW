@@ -21,8 +21,7 @@ field_size = 16
 
 # lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'ks', 'wcx', 'spr', 'reg']
-# tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
 
 
 def main():
@@ -88,7 +87,7 @@ def main():
         add_test(res_dict, 'cov', check_covar, traces)
         add_test(res_dict, 'bent', check_byte_entropy, traces)
         add_test(res_dict, 'lz78', check_lz78_compress, traces)
-        # add_test(res_dict, 'lz77', check_lz77_compress, traces)
+        add_test(res_dict, 'lz77', check_lz77_compress, traces)
         add_test(res_dict, 'ks', check_ks, traces, dummy_id_iter[i])
         add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
@@ -165,13 +164,13 @@ def check_byte_repeat(trace):
 
 def check_entropy(trace, nb=field_size):
     _, dist = np.unique(trace, return_counts=True)
-    return stats.entropy(dist, base=2)
+    return stats.entropy(dist)
 
 def check_byte_entropy(trace):
     mask = (1 << (field_size // 2)) - 1
     ob_trace = [e & mask for e in trace] + [e & ~mask for e in trace]
     _ , dist = np.unique(ob_trace, return_counts=True)
-    return stats.entropy(dist, base=2)
+    return stats.entropy(dist)
 
 def check_covar(trace):
     return onepass_covar(trace)
@@ -190,6 +189,26 @@ def check_ks(trace, dummy_carrier):
 
 def check_regularity(trace):
     return regularity(trace)
+
+def check_cce(trace):
+    return cce(trace)
+
+def cce(tr):
+    N = len(tr)
+    e = [0]
+    cce = []
+    for L in range(1,N):
+        space = [tuple(tr[i:i+L]) for i in range(N-L+1)]
+        un,cnt = np.unique(space, return_counts=True, axis=0)
+        e.append(stats.entropy(cnt))
+        ceL = e[L] - e [L-1]
+        percL = un.shape[0] / len(space)
+        cce.append(ceL + percL*e[1])
+        print(e[L], percL, ceL, cce[L-1])
+        if percL == 1.0: 
+            break
+    return men(cce)
+
 
 
 def regularity(tr):
