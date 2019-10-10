@@ -6,11 +6,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg', 'cce']
 
 def main():
     # df_files = ['testsWC.df', 'testsEQWC.df', 'testsXRWC.df', 'testsEQXRWC.df']
-    df_files = ['testsdum.df']
+    df_files = ['testswSDT.df']
 
     # df_files = [
     #             'tests1000WC.df',

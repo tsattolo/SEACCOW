@@ -10,16 +10,17 @@ from functools import partial
 import pandas as pd
 import numpy as np
 import argparse
+import pickle as pkl
 import lz78
 from itertools import chain
 from scipy import stats
 
-sys.path.append(os.path.join(sys.path[0],'lz77','LZ77-Compressor','src'))
-# from LZ77 import LZ77Compressor
+sys.path.append(os.path.join(sys.path[0],'lz77','src'))
+from LZ77 import LZ77Compressor
 
 field_size = 16
 
-# lz77 = LZ77Compressor() 
+lz77 = LZ77Compressor() 
 
 tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
 
@@ -30,6 +31,7 @@ def main():
     parser.add_argument('-m', '--message')
     parser.add_argument('-i', '--iterations', type=int)
     parser.add_argument('-o', '--output')
+    parser.add_argument('-c', '--carrier_file', default='')
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
     parser.add_argument('--xor_rand', action='store_true')
     parser.add_argument('--whole_carrier', action='store_true')
@@ -40,44 +42,42 @@ def main():
 
     with open(args.message, 'rb') as f:
         msg = list(f.read(args.nbytes))
-    
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
 
+    try:
+        with open(args.carrier_file, 'rb') as f:
+            real_id_iter, dummy_id_iter = pkl.load(f)
+        if not (len(real_id_iter) >= args.iterations and len(dummy_id_iter) >= args.iterations):
+            raise IOError
+    except IOError:
+        real_ids = []
+        pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
 
-    real_ids = []
-    pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
+        stop_filter = lambda _: len(real_ids) == args.iterations*nbits*2
+        
+        sniff(offline=pcap_files, 
+             prn=partial(get_ip_id, real_ids), 
+             store=0, 
+             stop_filter= stop_filter)
+        
+        if not stop_filter(None):
+            pdb.set_trace()
 
-    stop_filter = lambda _: len(real_ids) == args.iterations*nbits*2
-    
-    sniff(offline=pcap_files, 
-         prn=partial(get_ip_id, real_ids), 
-         store=0, 
-         stop_filter= stop_filter)
-    
-    if not stop_filter(None):
-        pdb.set_trace()
-        # new_iterations = len(real_ids) // nbits
-        # print('Not enough packet for  %i iterations, doing %i instead' % 
-        #         (args.iterations, new_iterations))
-        # real_ids = real_ids[:new_iterations*nbits]
-        # args.iterations = new_iterations
-
-    real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
-    dummy_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations, 2*args.iterations)]
+        real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
+        dummy_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations, 2*args.iterations)]
+    finally:
+        if args.carrier_file:
+            with open(args.carrier_file, 'wb') as f:
+                 pkl.dump((real_id_iter, dummy_id_iter), f)
 
     np.random.shuffle(real_id_iter)
     np.random.shuffle(dummy_id_iter)
-
-    # np.seterr(all='call')
-    # np.seterrcall(pdb.set_trace)
-
 
     random.seed(17)
 
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
-        # pdb.set_trace()
         traces = inject(field_size, real_id_iter[i], bits,
                         args.xor_rand, args.whole_carrier, args.rand_loc, args.eq_space)
         add_test(res_dict, 'comp', check_compress, traces)
@@ -92,6 +92,7 @@ def main():
         add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
         add_test(res_dict, 'reg', check_regularity, traces)
+        # add_test(res_dict, 'cce', check_cce, traces)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -204,10 +205,10 @@ def cce(tr):
         ceL = e[L] - e [L-1]
         percL = un.shape[0] / len(space)
         cce.append(ceL + percL*e[1])
-        print(e[L], percL, ceL, cce[L-1])
+        # print(e[L], percL, ceL, cce[L-1])
         if percL == 1.0: 
             break
-    return men(cce)
+    return min(cce)
 
 
 
