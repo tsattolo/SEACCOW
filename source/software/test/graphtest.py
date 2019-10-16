@@ -10,7 +10,7 @@ tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx
 
 def main():
     # df_files = ['testsWC.df', 'testsEQWC.df', 'testsXRWC.df', 'testsEQXRWC.df']
-    df_files = ['testswSDT.df']
+    df_files = ['testsdum_noenc.df']
 
     # df_files = [
     #             'tests1000WC.df',
