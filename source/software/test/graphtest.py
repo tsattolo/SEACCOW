@@ -48,14 +48,13 @@ def main():
             print("Min Cohen's D for %s:" % t)
             cohend = (dfnz.mean() / sd).abs()
             print('%d, %f' %(cohend.idxmin(), cohend.min()))
-            # pdb.set_trace()
             
             
             plt.plot(cohend, style, label=name)
             # plt.errorbar(dfnz.columns, dfnz.mean(), yerr=dfnz.std(), linestyle='None')
             plt.xticks(dfnz.columns)
             # plt.legend()
-            # plt.ylim(0,20)
+            plt.ylim(0,20)
             plt.xlabel('Bits / Element')
             plt.ylabel('Effect Size')
 

@@ -14,6 +14,7 @@ import pickle as pkl
 import lz78
 from itertools import chain
 from scipy import stats
+from Crypto.Cipher import Salsa20
 
 sys.path.append(os.path.join(sys.path[0],'lz77','src'))
 from LZ77 import LZ77Compressor
@@ -22,7 +23,7 @@ field_size = 16
 
 lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg', 'cce']
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
     parser.add_argument('-o', '--output')
     parser.add_argument('-c', '--carrier_file', default='')
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
-    parser.add_argument('--xor_rand', action='store_true')
+    parser.add_argument('--encrypt', action='store_true')
     parser.add_argument('--whole_carrier', action='store_true')
     parser.add_argument('--rand_loc', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
@@ -41,7 +42,13 @@ def main():
     args = parser.parse_args()
 
     with open(args.message, 'rb') as f:
-        msg = list(f.read(args.nbytes))
+        msg = f.read(args.nbytes)
+
+    if args.encrypt:
+        key = b'pTuL7zxs6e3dAFMioJoS01OhBrO9SXGw'
+        cipher = Salsa20.new(key=key)
+        msg = cipher.encrypt(msg)
+
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
 
@@ -61,8 +68,7 @@ def main():
              store=0, 
              stop_filter= stop_filter)
         
-        if not stop_filter(None):
-            pdb.set_trace()
+        assert(stop_filter(None))
 
         real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
         dummy_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations, 2*args.iterations)]
@@ -78,8 +84,8 @@ def main():
 
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
-        traces = inject(field_size, real_id_iter[i], bits,
-                        args.xor_rand, args.whole_carrier, args.rand_loc, args.eq_space)
+        traces = inject(field_size, real_id_iter[i], bits, 
+                args.whole_carrier, args.rand_loc, args.eq_space)
         add_test(res_dict, 'comp', check_compress, traces)
         add_test(res_dict, 'rep', check_repeat, traces)
         add_test(res_dict, 'brep', check_byte_repeat, traces)
@@ -92,7 +98,7 @@ def main():
         add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
         add_test(res_dict, 'reg', check_regularity, traces)
-        # add_test(res_dict, 'cce', check_cce, traces)
+        add_test(res_dict, 'cce', check_cce, traces)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -108,7 +114,7 @@ def main():
 
     
 def inject(field_size, carrier, message_bits, 
-           xor_rand=False, whole_carrier=False, rand_loc=False, eq_space=False):
+           whole_carrier=False, rand_loc=False, eq_space=False):
     # bls = []
     traces = []
     for bp in range(field_size + 1):
@@ -125,13 +131,10 @@ def inject(field_size, carrier, message_bits,
         
         
         mask = ~((1 << bp) - 1)
-        xored = random.getrandbits(bp) if xor_rand and bp > 0 else 0
 
-        # trace  = [((b & mask) | (m ^ xored)).to_bytes(2, byteorder='big') for b, m in zip(carrier, pktm)]
-        trace  = [(b & mask) | (m ^ xored) for b, m in zip(carrier, pktm)]
+        trace  = [(b & mask) | m for b, m in zip(carrier, pktm)]
         traces.append(trace)
 
-        # pdb.set_trace()
 
     return traces
 
