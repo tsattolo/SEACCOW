@@ -3,7 +3,6 @@
 from scapy.all import *
 import sys, os
 
-import random
 import pdb
 import lzma
 from functools import partial
@@ -22,7 +21,7 @@ field_size = 16
 
 lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg', 'cce']
 
 
 def main():
@@ -35,7 +34,7 @@ def main():
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
     parser.add_argument('--xor_rand', action='store_true')
     parser.add_argument('--whole_carrier', action='store_true')
-    parser.add_argument('--rand_loc', action='store_true')
+    parser.add_argument('--rand_jump', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
 
     args = parser.parse_args()
@@ -43,43 +42,61 @@ def main():
     with open(args.message, 'rb') as f:
         msg = list(f.read(args.nbytes))
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
+    
     nbits =  len(bits)
+
+    np.random.seed(17)
+    if args.rand_jump:
+        jumps = [np.random.randint(1, 10, size=nbits) for _ in range(args.iterations)]
+    else:
+        jumps = [np.ones(nbits, dtype=int) for _ in range(args.iterations)]
+
+
+    ids_needed = [np.sum(j) for j in jumps] 
+    nids = np.sum(ids_needed)*2
+
+    # pdb.set_trace()
+
 
     try:
         with open(args.carrier_file, 'rb') as f:
-            real_id_iter, dummy_id_iter = pkl.load(f)
-        if not (len(real_id_iter) >= args.iterations and len(dummy_id_iter) >= args.iterations):
+            all_ids = pkl.load(f)
+        if not len(all_ids) >= nids:
             raise IOError
     except IOError:
-        real_ids = []
+        all_ids = []
         pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
 
-        stop_filter = lambda _: len(real_ids) == args.iterations*nbits*2
+        stop_filter = lambda _: len(all_ids) == nids
         
         sniff(offline=pcap_files, 
-             prn=partial(get_ip_id, real_ids), 
+             prn=partial(get_ip_id, all_ids), 
              store=0, 
              stop_filter= stop_filter)
         
         if not stop_filter(None):
             pdb.set_trace()
 
-        real_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations)]
-        dummy_id_iter = [real_ids[i*nbits:(i+1)*nbits] for i in range(args.iterations, 2*args.iterations)]
-    finally:
+        # np.random.shuffle(all_ids)
+
         if args.carrier_file:
             with open(args.carrier_file, 'wb') as f:
-                 pkl.dump((real_id_iter, dummy_id_iter), f)
+                 pkl.dump(all_ids, f)
 
-    np.random.shuffle(real_id_iter)
-    np.random.shuffle(dummy_id_iter)
 
-    random.seed(17)
+    # np.random.shuffle(all_ids)
+
+    real_ids = all_ids[len(all_ids) // 2:]
+    dummy_ids = all_ids[:len(all_ids) // 2]
+
+    ids_needed_cum = np.cumsum(ids_needed)
+    real_id_iter = [real_ids[b:e] for b,e in zip([0] + list(ids_needed_cum), list(ids_needed_cum))]
+    dummy_id_iter = [dummy_ids[b:e] for b,e in zip([0] + list(ids_needed_cum), list(ids_needed_cum))]
 
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
-        traces = inject(field_size, real_id_iter[i], bits,
-                        args.xor_rand, args.whole_carrier, args.rand_loc, args.eq_space)
+        traces = inject(field_size, real_id_iter[i], bits, jumps[i],
+                        args.xor_rand, args.whole_carrier, args.eq_space)
         add_test(res_dict, 'comp', check_compress, traces)
         add_test(res_dict, 'rep', check_repeat, traces)
         add_test(res_dict, 'brep', check_byte_repeat, traces)
@@ -92,7 +109,7 @@ def main():
         add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
         add_test(res_dict, 'reg', check_regularity, traces)
-        # add_test(res_dict, 'cce', check_cce, traces)
+        add_test(res_dict, 'cce', check_cce, traces)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -107,23 +124,23 @@ def main():
 
 
     
-def inject(field_size, carrier, message_bits, 
-           xor_rand=False, whole_carrier=False, rand_loc=False, eq_space=False):
+def inject(field_size, carrier, message_bits, jumps,
+           xor_rand=False, whole_carrier=False, eq_space=False):
     # bls = []
     traces = []
+    nbits = len(message_bits)
     for bp in range(field_size + 1):
         
-        pktm = get_pktm(message_bits, bp) if not bp == 0 else []
-        
-        if (whole_carrier and not eq_space)  or bp == 0:
-            pktm.extend([0] * (len(carrier) - len(pktm)))
+        pktm = get_pktm(message_bits, bp) if not bp == 0 else [0]*nbits
+
+        # pdb.set_trace()
+        if whole_carrier and not eq_space:
+            pktm.extend([0] * (nbits - len(pktm)))
         elif eq_space:
             pktm = list(chain(*[[e] + [0]*(bp -1) for e in pktm]))
-        
-        if rand_loc:
-            random.shuffle(pktm)
-        
-        
+
+        pktm = list(chain(*[[e] + [0]*(j - 1) for e, j in zip(pktm, jumps)]))
+
         mask = ~((1 << bp) - 1)
         xored = random.getrandbits(bp) if xor_rand and bp > 0 else 0
 

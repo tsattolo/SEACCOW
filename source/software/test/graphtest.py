@@ -55,7 +55,7 @@ def main():
             # plt.errorbar(dfnz.columns, dfnz.mean(), yerr=dfnz.std(), linestyle='None')
             plt.xticks(dfnz.columns)
             # plt.legend()
-            # plt.ylim(0,20)
+            plt.ylim(0,20)
             plt.xlabel('Bits / Element')
             plt.ylabel('Effect Size')
 
