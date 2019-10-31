@@ -15,28 +15,29 @@ import lz78
 from itertools import chain
 from scipy import stats
 from Crypto.Cipher import Salsa20
+from Crypto.Cipher import AES
 
 sys.path.append(os.path.join(sys.path[0],'lz77','src'))
 from LZ77 import LZ77Compressor
+from lempel_ziv_complexity import lempel_ziv_complexity
 
 field_size = 16
+max_jump = 5
 
 lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg', 'cce']
+tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'lzc', 'ks', 'wcx', 'spr', 'reg', 'cce']
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--pcap_folder')
     parser.add_argument('-m', '--message')
     parser.add_argument('-i', '--iterations', type=int)
     parser.add_argument('-o', '--output')
     parser.add_argument('-c', '--carrier_file', default='')
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
+    parser.add_argument('-j', '--jump', type=int, default=1, choices=range(1,max_jump + 1))
     parser.add_argument('--encrypt', action='store_true')
-    parser.add_argument('--whole_carrier', action='store_true')
-    parser.add_argument('--rand_jump', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
 
     args = parser.parse_args()
@@ -46,63 +47,29 @@ def main():
 
     if args.encrypt:
         key = b'pTuL7zxs6e3dAFMioJoS01OhBrO9SXGw'
-        cipher = Salsa20.new(key=key)
+        # cipher = Salsa20.new(key=key)
+        cipher = AES.new(key, AES.MODE_CBC)
         msg = cipher.encrypt(msg)
 
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
 
     np.random.seed(17)
-    if args.rand_jump:
-        jumps = [np.random.randint(1, 10, size=nbits) for _ in range(args.iterations)]
-    else:
-        jumps = [np.ones(nbits, dtype=int) for _ in range(args.iterations)]
+    jumps = np.ones(nbits, dtype=int) if args.jump == 1 else np.random.randint(1, args.jump, size=nbits)
 
 
-    ids_needed = [np.sum(j) for j in jumps] 
-    nids = np.sum(ids_needed)*2
 
-    # pdb.set_trace()
+    with open(args.carrier_file, 'rb') as f:
+        real_id_iter, dummy_id_iter = pkl.load(f)
 
-
-    try:
-        with open(args.carrier_file, 'rb') as f:
-            all_ids = pkl.load(f)
-        if not len(all_ids) >= nids:
-            raise IOError
-    except IOError:
-        all_ids = []
-        pcap_files = [args.pcap_folder + pf for pf in os.listdir(args.pcap_folder) if pf.endswith('.pcap')]
-
-        stop_filter = lambda _: len(real_ids) == args.iterations*nbits*2
-        
-        sniff(offline=pcap_files, 
-             prn=partial(get_ip_id, all_ids), 
-             store=0, 
-             stop_filter= stop_filter)
-        
-        assert(stop_filter(None))
-
-    if args.carrier_file:
-     	with open(args.carrier_file, 'wb') as f:
-     	   pkl.dump((real_id_iter, dummy_id_iter), f)
-
-    np.random.shuffle(real_id_iter)
-    np.random.shuffle(dummy_id_iter)
-
-    # np.random.shuffle(all_ids)
-
-    real_ids = all_ids[len(all_ids) // 2:]
-    dummy_ids = all_ids[:len(all_ids) // 2]
-
-    ids_needed_cum = np.cumsum(ids_needed)
-    real_id_iter = [real_ids[b:e] for b,e in zip([0] + list(ids_needed_cum), list(ids_needed_cum))]
-    dummy_id_iter = [dummy_ids[b:e] for b,e in zip([0] + list(ids_needed_cum), list(ids_needed_cum))]
+    ids_needed = np.sum(jumps) 
+    real_id_iter = [a[:ids_needed] for a in real_id_iter]
+    dummy_id_iter = [a[:ids_needed] for a in dummy_id_iter]
 
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
-        traces = inject(field_size, real_id_iter[i], bits, jumps[i],
-                      args.whole_carrier, args.eq_space)
+        traces = inject(field_size, real_id_iter[i], bits, jumps, eq_space=args.eq_space)
+
         add_test(res_dict, 'comp', check_compress, traces)
         add_test(res_dict, 'rep', check_repeat, traces)
         add_test(res_dict, 'brep', check_byte_repeat, traces)
@@ -116,6 +83,7 @@ def main():
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
         add_test(res_dict, 'reg', check_regularity, traces)
         add_test(res_dict, 'cce', check_cce, traces)
+        add_test(res_dict, 'lzc', check_lzc, traces)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -130,8 +98,7 @@ def main():
 
 
     
-def inject(field_size, carrier, message_bits, jumps,
-           whole_carrier=False, eq_space=False):
+def inject(field_size, carrier, message_bits, jumps, whole_carrier=True, eq_space=False):
     # bls = []
     traces = []
     nbits = len(message_bits)
@@ -145,12 +112,15 @@ def inject(field_size, carrier, message_bits, jumps,
         elif eq_space:
             pktm = list(chain(*[[e] + [0]*(bp -1) for e in pktm]))
 
-        pktm = list(chain(*[[e] + [0]*(j - 1) for e, j in zip(pktm, jumps)]))
+        jump_mult = 1 if bp == 0 else bp
+        pktm = list(chain(*[[e] + [0]*(j - 1) for e, j in zip(pktm, jumps * jump_mult)]))
+
 
         mask = ~((1 << bp) - 1)
 
 
         trace  = [(b & mask) | m for b, m in zip(carrier, pktm)]
+
         traces.append(trace)
 
         # pdb.set_trace()
@@ -216,6 +186,13 @@ def check_regularity(trace):
 def check_cce(trace):
     return cce(trace)
 
+def check_lzc(trace):
+    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+    # pdb.set_trace()
+    # print(btr)
+    return lempel_ziv_complexity(btr)
+
+
 def cce(tr):
     N = len(tr)
     e = [0]
@@ -270,10 +247,6 @@ def get_pktm(bits, bits_per):
     pktb = [bits[i:i+bits_per] for i in range(0, len(bits), bits_per)]
     return [int(''.join(m), 2) for m in pktb]
     
-
-def get_ip_id(ids, pkt):
-    if IP in pkt:
-        ids.append(pkt['IP'].fields['id'])
 
 if __name__ == "__main__":
     main()

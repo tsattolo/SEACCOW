@@ -5,8 +5,26 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
+from tabulate import tabulate
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'ks', 'wcx', 'spr', 'reg', 'cce']
+tests = ['comp', 'lz77', 'lz78', 'lzc', 'ent', 'cce', 'rep', 'cov', 'ks', 'wcx', 'spr', 'reg']
+
+rows = [
+        'LZMA Compression',
+        'LZ77 Compression',
+        'LZ78 Compression',
+        'Lempel-Ziv Complexity',
+        'First-Order Entropy',
+        'Corrected Conditional Entropy',
+        'Repetition',
+        'Autocovariance',
+        'Kolmogorov-Smirnov Test',
+        'Wilcoxon Signed Rank',
+        'Spearman Correlation',
+        'Regularity'
+        ]
+
+columns = ['1-bit Trace Effect Size', 'Minimum Effect Size', 'Minimum Effect Size Trace']
 
 def main():
     # df_files = ['testsWC.df', 'testsEQWC.df', 'testsXRWC.df', 'testsEQXRWC.df']
@@ -33,8 +51,8 @@ def main():
     styles = ['b.', 'r.', 'g.', 'y.'] + ['bx', 'rx', 'gx', 'yx'] + ['b+', 'r+', 'g+', 'y+']
     names = ['Neither', 'Spaced', 'XORed', 'Both'] * 3
     assert(len(styles) >= len(df_list))
-    
 
+    table = []
     for t in tests:
         plt.figure()
         for (df, style, name) in zip(df_list, styles, names):
@@ -45,10 +63,11 @@ def main():
 
             
             sd = ((dfnz.var() + dft[0].var())/2).pow(0.5)
-            print("Min Cohen's D for %s:" % t)
+            # print("Min Cohen's D for %s:" % t)
             cohend = (dfnz.mean() / sd).abs()
-            print('%d, %f' %(cohend.idxmin(), cohend.min()))
-            
+            # print('%d, %f' %(cohend.idxmin(), cohend.min()))
+           
+            table.append([cohend[1], cohend.min(), cohend.idxmin()])
             
             plt.plot(cohend, style, label=name)
             # plt.errorbar(dfnz.columns, dfnz.mean(), yerr=dfnz.std(), linestyle='None')
@@ -62,7 +81,8 @@ def main():
         plt.savefig('testplots/%s.pdf' %  t) 
         plt.savefig('testplots/%s.png' %  t) 
     
-
+    pdb.set_trace()
+    print(tabulate(table, headers=columns, showindex=rows))
     
 
 if __name__ == "__main__":
