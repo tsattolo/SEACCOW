@@ -29,7 +29,7 @@ columns = ['1-bit Trace', 'Minimum', 'Min. Index']
 # variations = ['Neither', 'Encrypted', 'Jump', 'Both']
 variations = ['Y', 'N']
 n_cols = 3
-undef_symbol = '\\perp'
+undef_symbol = '$\\perp$'
 
 def main():
     df_files = sys.argv[1:]
