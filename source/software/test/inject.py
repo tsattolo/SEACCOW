@@ -47,8 +47,10 @@ def main():
 
     if args.encrypt:
         key = b'pTuL7zxs6e3dAFMioJoS01OhBrO9SXGw'
-        # cipher = Salsa20.new(key=key)
-        cipher = AES.new(key, AES.MODE_CBC)
+        if args.nbytes % AES.block_size == 0:
+            cipher = AES.new(key, AES.MODE_CBC)
+        else:
+            cipher = Salsa20.new(key=key)
         msg = cipher.encrypt(msg)
 
     bits = [d for c in msg for d in '{0:08b}'.format(c)]

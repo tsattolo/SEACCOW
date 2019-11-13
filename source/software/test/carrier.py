@@ -7,15 +7,15 @@ import pdb, sys, os
 import numpy as np
 import pickle as pkl
 
-max_iter = 100
-max_message_bytes = 100
-max_jump = 5
+max_iter = 1000
+max_message_bytes = 256
+max_jump = 1
 
 ids_per_iter = max_message_bytes * max_jump * 8 * 2 #for dummy
 ids_total = ids_per_iter * max_iter
 
 pcap_folder = 'pcap/'
-carrier_file = 'carrier.pkl'
+carrier_file = 'carrier2.pkl'
 
 def main():
     all_ids = []
