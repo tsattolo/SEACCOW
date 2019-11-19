@@ -24,7 +24,7 @@ def main():
     stop_filter = lambda _: len(all_ids) == ids_total
     
     sniff(offline=pcap_files, 
-         prn=partial(get_ip_id, all_ids), 
+         prn=partial(get_tcp_urg, all_ids), 
          store=0, 
          stop_filter= stop_filter)
     
@@ -67,6 +67,14 @@ def main():
 def get_ip_id(ids, pkt):
     if IP in pkt:
         ids.append(pkt['IP'].fields['id'])
+
+def get_ip_ttl(ids, pkt):
+    if IP in pkt:
+        ids.append(pkt['IP'].fields['ttl'])
+
+def get_tcp_urg(ids, pkt):
+    if TCP in pkt and 'U' in pkt['TCP'].flags:
+        ids.append(pkt['TCP'].urgptr)
 
 if __name__ == "__main__":
     main()
