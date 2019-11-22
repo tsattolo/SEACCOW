@@ -49,14 +49,23 @@ test_sets = [
 nperm = 1000
 
 def main():
+
+    # df_files = [
+    #             'results_1000iter/1_256.df',
+    #             'results_1000iter/1_64.df',
+    #             'results_1000iter/1_16.df',
+    #             'results_1000iter/1_4.df',
+    #             'results_1000iter/1_1.df',
+    #             ]
+    # nbytes = [256, 64, 16, 4, 1]
+
     df_files = [
-                'results_1000iter/1_256.df',
-                'results_1000iter/1_64.df',
-                'results_1000iter/1_16.df',
-                'results_1000iter/1_4.df',
-                'results_1000iter/1_1.df',
+                'tcp_hb_256.df',
+                # 'tcp_hb_64.df',
+                'tcp_hb_16.df',
                 ]
-    nbytes = [256, 64, 16, 4, 1]
+    nbytes = [256, 16]
+
     df_list = [pd.read_pickle(e) for e in df_files]
     
 

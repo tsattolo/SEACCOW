@@ -12,6 +12,7 @@ import numpy as np
 import argparse
 import pickle as pkl
 import lz78
+import library as lib
 from itertools import chain
 from scipy import stats
 from Crypto.Cipher import Salsa20
@@ -21,12 +22,9 @@ sys.path.append(os.path.join(sys.path[0],'lz77','src'))
 from LZ77 import LZ77Compressor
 from lempel_ziv_complexity import lempel_ziv_complexity
 
-field_size = 16
-max_jump = 5
-
 lz77 = LZ77Compressor() 
 
-tests = ['comp', 'rep', 'brep', 'ent', 'bent', 'cov', 'lz78', 'lz77', 'lzc', 'ks', 'wcx', 'spr', 'reg', 'cce']
+tests = lib.all_tests 
 
 
 def main():
@@ -36,11 +34,21 @@ def main():
     parser.add_argument('-o', '--output')
     parser.add_argument('-c', '--carrier_file', default='')
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
-    parser.add_argument('-j', '--jump', type=int, default=1, choices=range(1,max_jump + 1))
+    parser.add_argument('-j', '--jump', type=int, default=1)
+    parser.add_argument('-f', '--field_size', type=int, default=1)
     parser.add_argument('--encrypt', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
 
     args = parser.parse_args()
+
+    with open(args.carrier_file, 'rb') as f:
+        carrier_args, real_id_iter, dummy_id_iter = pkl.load(f)
+
+    verify_carrier_args(args, carrier_args)
+
+    field_bytes = args.field_size // 8
+
+
 
     with open(args.message, 'rb') as f:
         msg = f.read(args.nbytes)
@@ -59,33 +67,26 @@ def main():
     np.random.seed(17)
     jumps = np.ones(nbits, dtype=int) if args.jump == 1 else np.random.randint(1, args.jump, size=nbits)
 
-
-
-    with open(args.carrier_file, 'rb') as f:
-        real_id_iter, dummy_id_iter = pkl.load(f)
-
     ids_needed = np.sum(jumps) 
     real_id_iter = [a[:ids_needed] for a in real_id_iter]
     dummy_id_iter = [a[:ids_needed] for a in dummy_id_iter]
 
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
-        traces = inject(field_size, real_id_iter[i], bits, jumps, eq_space=args.eq_space)
+        traces = inject(args.field_size, real_id_iter[i], bits, jumps, eq_space=args.eq_space)
 
-        add_test(res_dict, 'comp', check_compress, traces)
+        add_test(res_dict, 'comp', check_compress, traces, field_bytes)
         add_test(res_dict, 'rep', check_repeat, traces)
-        add_test(res_dict, 'brep', check_byte_repeat, traces)
         add_test(res_dict, 'ent', check_entropy, traces)
         add_test(res_dict, 'cov', check_covar, traces)
-        add_test(res_dict, 'bent', check_byte_entropy, traces)
-        add_test(res_dict, 'lz78', check_lz78_compress, traces)
-        add_test(res_dict, 'lz77', check_lz77_compress, traces)
+        add_test(res_dict, 'lz78', check_lz78_compress, traces, field_bytes)
+        add_test(res_dict, 'lz77', check_lz77_compress, traces, field_bytes)
         add_test(res_dict, 'ks', check_ks, traces, dummy_id_iter[i])
         add_test(res_dict, 'wcx', check_wilcoxon, traces, dummy_id_iter[i])
         add_test(res_dict, 'spr', check_spearman, traces, dummy_id_iter[i])
         add_test(res_dict, 'reg', check_regularity, traces)
         add_test(res_dict, 'cce', check_cce, traces)
-        add_test(res_dict, 'lzc', check_lzc, traces)
+        add_test(res_dict, 'lzc', check_lzc, traces, field_bytes)
 
     
     df_dict = dict([(k, pd.DataFrame(v).T) for k, v in res_dict.items()])
@@ -93,22 +94,14 @@ def main():
     df = pd.concat(df_dict).T
 
     df.to_pickle(args.output)
-
-
-
-
-
-
     
 def inject(field_size, carrier, message_bits, jumps, whole_carrier=True, eq_space=False):
-    # bls = []
     traces = []
     nbits = len(message_bits)
     for bp in range(field_size + 1):
         
         pktm = get_pktm(message_bits, bp) if not bp == 0 else [0]*nbits
 
-        # pdb.set_trace()
         if whole_carrier and not eq_space:
             pktm.extend([0] * (nbits - len(pktm)))
         elif eq_space:
@@ -125,28 +118,22 @@ def inject(field_size, carrier, message_bits, jumps, whole_carrier=True, eq_spac
 
         traces.append(trace)
 
-        # pdb.set_trace()
-
     return traces
 
 def add_test(res_dict, key, func, traces, *args):
     res_dict[key].append([func(trace, *args) for trace in traces])
     return
     
-
-
-
-    
 def check_compress(trace):
-    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+    btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return len(lzma.compress(btr)) / len(btr)
 
-def check_lz78_compress(trace):
-    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+def check_lz78_compress(trace, field_bytes):
+    btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return len(lz78.compress(btr)) / len(btr)
 
-def check_lz77_compress(trace):
-    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
+def check_lz77_compress(trace, field_bytes):
+    btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return len(lz77.compress(btr)) / len(btr)
 
 def check_repeat(trace):
@@ -188,10 +175,8 @@ def check_regularity(trace):
 def check_cce(trace):
     return cce(trace)
 
-def check_lzc(trace):
-    btr = b''.join([e.to_bytes(2, byteorder='big') for e in trace])
-    # pdb.set_trace()
-    # print(btr)
+def check_lzc(trace, field_bytes):
+    btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return lempel_ziv_complexity(btr)
 
 
@@ -248,6 +233,12 @@ def online_covariance(data1, data2):
 def get_pktm(bits, bits_per): 
     pktb = [bits[i:i+bits_per] for i in range(0, len(bits), bits_per)]
     return [int(''.join(m), 2) for m in pktb]
+
+def verify_carrier_args(this, carrier):
+    assert this.iterations <= carrier.iterations
+    assert this.nbytes * this.jump <= carrier.nbytes * carrier.jump
+    assert this.field_size <= lib.field_sizes[carrier.field]
+
     
 
 if __name__ == "__main__":
