@@ -46,6 +46,7 @@ def main():
     assert stop_filter(None), '%d ids available, %d needed' % (len(all_ids), ids_total)
 
 
+    np.random.seed(27)
     id_iter = [all_ids[i*ids_per_iter:(i+1)*ids_per_iter] for i in range(args.iterations)]
     np.random.shuffle(id_iter)
     real_id_iter = [a[:len(a) // 2] for a in id_iter]

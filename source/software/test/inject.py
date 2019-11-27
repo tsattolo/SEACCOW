@@ -3,7 +3,6 @@
 from scapy.all import *
 import sys, os
 
-import random
 import pdb
 import lzma
 from functools import partial
@@ -12,6 +11,7 @@ import numpy as np
 import argparse
 import pickle as pkl
 import lz78
+import math
 import library as lib
 from itertools import chain
 from scipy import stats
@@ -29,26 +29,22 @@ tests = lib.all_tests
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--message')
+    parser.add_argument('-m', '--message', default='message.txt')
     parser.add_argument('-i', '--iterations', type=int)
     parser.add_argument('-o', '--output')
     parser.add_argument('-c', '--carrier_file', default='')
     parser.add_argument('-n', '--nbytes', type=int, default=1000)
     parser.add_argument('-j', '--jump', type=int, default=1)
-    parser.add_argument('-f', '--field_size', type=int, default=1)
+    parser.add_argument('-f', '--field_size', type=int, default=16)
     parser.add_argument('--encrypt', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
 
     args = parser.parse_args()
 
     with open(args.carrier_file, 'rb') as f:
-        carrier_args, real_id_iter, dummy_id_iter = pkl.load(f)
+        real_id_iter, dummy_id_iter, carrier_args = pkl.load(f)
 
     verify_carrier_args(args, carrier_args)
-
-    field_bytes = args.field_size // 8
-
-
 
     with open(args.message, 'rb') as f:
         msg = f.read(args.nbytes)
@@ -71,13 +67,14 @@ def main():
     real_id_iter = [a[:ids_needed] for a in real_id_iter]
     dummy_id_iter = [a[:ids_needed] for a in dummy_id_iter]
 
+    field_bytes = int(math.ceil(args.field_size / 8))
     res_dict = {t:[] for t in tests}
     for i in range(args.iterations):
         traces = inject(args.field_size, real_id_iter[i], bits, jumps, eq_space=args.eq_space)
 
-        add_test(res_dict, 'comp', check_compress, traces, field_bytes)
+        add_test(res_dict, 'lzma', check_compress, traces, field_bytes)
         add_test(res_dict, 'rep', check_repeat, traces)
-        add_test(res_dict, 'ent', check_entropy, traces)
+        add_test(res_dict, 'foe', check_entropy, traces)
         add_test(res_dict, 'cov', check_covar, traces)
         add_test(res_dict, 'lz78', check_lz78_compress, traces, field_bytes)
         add_test(res_dict, 'lz77', check_lz77_compress, traces, field_bytes)
@@ -124,7 +121,7 @@ def add_test(res_dict, key, func, traces, *args):
     res_dict[key].append([func(trace, *args) for trace in traces])
     return
     
-def check_compress(trace):
+def check_compress(trace, field_bytes):
     btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return len(lzma.compress(btr)) / len(btr)
 
@@ -139,19 +136,8 @@ def check_lz77_compress(trace, field_bytes):
 def check_repeat(trace):
     return len(set(trace)) / len(trace)
 
-def check_byte_repeat(trace):
-    mask = (1 << (field_size // 2)) - 1
-    ob_trace = [e & mask for e in trace] + [e & ~mask for e in trace]
-    return len(set(ob_trace)) / len(ob_trace)
-
-def check_entropy(trace, nb=field_size):
+def check_entropy(trace):
     _, dist = np.unique(trace, return_counts=True)
-    return stats.entropy(dist)
-
-def check_byte_entropy(trace):
-    mask = (1 << (field_size // 2)) - 1
-    ob_trace = [e & mask for e in trace] + [e & ~mask for e in trace]
-    _ , dist = np.unique(ob_trace, return_counts=True)
     return stats.entropy(dist)
 
 def check_covar(trace):
@@ -179,6 +165,14 @@ def check_lzc(trace, field_bytes):
     btr = b''.join([e.to_bytes(field_bytes, byteorder='big') for e in trace])
     return lempel_ziv_complexity(btr)
 
+def check_byte_entropy(trace, field_bytes):
+    btr = list(chain(*[e.to_bytes(field_bytes, byteorder='big') for e in trace]))
+    _ , dist = np.unique(btr, return_counts=True)
+    return stats.entropy(dist)
+
+def check_byte_repeat(trace, field_bytes):
+    btr = list(chain(*[e.to_bytes(field_bytes, byteorder='big') for e in trace]))
+    return len(set(btr)) / len(btr)
 
 def cce(tr):
     N = len(tr)

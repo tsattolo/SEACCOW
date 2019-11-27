@@ -6,40 +6,38 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import pdb
-from tabulate import tabulate
-
+import library as lib
+import tabulate
+import argparse
 from scipy import stats
 
-tests = ['comp', 'lz77', 'lz78', 'lzc', 'ent', 'cce', 'rep']
-
-rows = [
-        'LZMA Compression',
-        'LZ77 Compression',
-        'LZ78 Compression',
-        'Lempel-Ziv Complexity',
-        'First-Order Entropy',
-        'Corr. Cond. Entropy',
-        'Repetition',
-        ]
+tests = lib.complexity_tests 
+rows = [t.upper() for t in tests]
 
 td =  {t:tests for t in tests}
 
 def main():
-    df_files = sys.argv[1:]
-    df_list = [pd.read_pickle(e) for e in df_files]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--output')
+    parser.add_argument('-d', '--dataframe')
+    parser.add_argument('-t', '--table_format', default='simple', choices=tabulate.tabulate_formats)
+    parser.add_argument('-b', '--bit', default=1, type=int)
+    args = parser.parse_args()
+
+    df = pd.read_pickle(args.dataframe)
     table = []
     for ct,tl in td.items():
-        for df in df_list:
-            row = []
-            for t in tl:
-                x = df[t][1] - df[t][0]
-                y = df[ct][1] - df[ct][0]
-                row.append(np.corrcoef(x,y)[0][1])
-            table.append(['%.2g' % r for r in row])
+        row = []
+        for t in tl:
+            x = df[t][args.bit] - df[t][0]
+            y = df[ct][args.bit] - df[ct][0]
+            row.append(np.corrcoef(x,y)[0][1])
+        table.append(['%.2g' % r for r in row])
 
     
-    columns_wm = ['\\rotcol{%s}' % c for c in rows]
-    print(tabulate(table, headers=columns_wm, showindex=rows, tablefmt='latex_raw'))
+    columns = rows 
+    with open(args.output, 'w') as f:
+        f.write(tabulate.tabulate(table, headers=columns, showindex=rows, tablefmt=args.table_format))
     
 
 
