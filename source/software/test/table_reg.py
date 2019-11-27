@@ -21,8 +21,11 @@ def main():
     parser.add_argument('-n', '--nbytes', nargs='+', type=int)
     parser.add_argument('-t', '--table_format', default='simple', choices=tabulate.tabulate_formats)
     parser.add_argument('-b', '--bit', default=1, type=int)
-    parser.add_argument('-p', '--permumtations', default=1000, type=int)
+    parser.add_argument('-p', '--permutations', default=1000, type=int)
     args = parser.parse_args()
+
+    if os.path.isfile(args.output):
+        return
 
     df_list = [pd.read_pickle(e) for e in args.dataframes]
 

@@ -38,8 +38,10 @@ def main():
     parser.add_argument('-f', '--field_size', type=int, default=16)
     parser.add_argument('--encrypt', action='store_true')
     parser.add_argument('--eq_space', action='store_true')
-
     args = parser.parse_args()
+                
+    if os.path.isfile(args.output):
+        return
 
     with open(args.carrier_file, 'rb') as f:
         real_id_iter, dummy_id_iter, carrier_args = pkl.load(f)
@@ -145,7 +147,7 @@ def check_covar(trace):
 
 
 def check_wilcoxon(trace, dummy_carrier):
-    return stats.wilcoxon(trace, dummy_carrier)[0]
+    return stats.wilcoxon(trace, dummy_carrier, zero_method='zsplit')[0]
 
 
 def check_spearman(trace, dummy_carrier):

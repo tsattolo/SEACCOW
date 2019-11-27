@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-import sys
+import sys, os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,6 +23,9 @@ def main():
     parser.add_argument('-t', '--table_format', default='simple', choices=tabulate.tabulate_formats)
     parser.add_argument('-b', '--bit', default=1, type=int)
     args = parser.parse_args()
+
+    if os.path.isfile(args.output):
+        return
 
     df = pd.read_pickle(args.dataframe)
     table = []

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-import sys
+import sys, os
 import pandas as pd
 import pdb
 from itertools import chain
@@ -20,6 +20,9 @@ def main():
     parser.add_argument('-t', '--table_format', default='simple', choices=tabulate.tabulate_formats)
     parser.add_argument('-b', '--bit', default=1, type=int)
     args = parser.parse_args()
+
+    if os.path.isfile(args.output):
+        return
 
     columns = ['%d-bit Trace' % args.bit, 'Minimum', 'Min. Index']
     undef_symbol = '$\\perp$' if 'latex' in args.table_format else 'nan'

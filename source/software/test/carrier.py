@@ -27,8 +27,10 @@ def main():
     parser.add_argument('-i', '--iterations', type=int, default=1000)
     parser.add_argument('-j', '--jump', type=int, default=1)
     parser.add_argument('-n', '--nbytes', type=int, default=256)
-
     args = parser.parse_args()
+
+    if os.path.isfile(args.output):
+        return
      
     ids_per_iter = args.nbytes * args.jump * 8 * 2 #for dummy
     ids_total = ids_per_iter * args.iterations
