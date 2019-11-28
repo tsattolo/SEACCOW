@@ -31,7 +31,7 @@ def main():
 
     if 'latex' in args.table_format:
         std_symbol = '$\\pm$' 
-        pre = '\\hline\\begin{tabular}{@{}l@{}} '
+        pre = '\\begin{tabular}{@{}l@{}} '
         post = '\\end{tabular}'
         splitter = ' \\\\ '
     else:
@@ -43,6 +43,7 @@ def main():
     
 
     table = []
+    np.random.seed(30 + lib.seed)
     
     for tests in test_sets:
         # print(tests)
@@ -61,7 +62,7 @@ def main():
 
             acclist = []
 
-            for i in range(args.permumtations):
+            for i in range(args.permutations):
                 p = np.random.permutation(N)
                 
                 train_ex = examples[p][:split].copy()

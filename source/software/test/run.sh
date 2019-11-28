@@ -31,7 +31,7 @@ run_internal () {
     ./inject.py -c $carrier -n $nbytes -i $iter -f $fieldsize -o $framefolder$nbytes'.df' &
     ./inject.py -c $carrier -n $nbytes -i $iter -f $fieldsize -o $framefolder$nbytes'E.df' --encrypt &
     wait
-    ./table.py -b $bit -t $table_format -d $framefolder$nbytes'.df' $framefolder$nbytes'E.df' -o $tablefolder$nbytes'eff.txt' &
+    ./table.py -b $bit -t $table_format -d $framefolder$nbytes'E.df' $framefolder$nbytes'.df' -o $tablefolder$nbytes'eff.txt' &
     ./table_corr.py -b $bit -t $table_format -d $framefolder$nbytes'.df' -o $tablefolder$nbytes'corr.txt' &
 }
 

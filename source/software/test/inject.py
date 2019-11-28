@@ -54,15 +54,15 @@ def main():
     if args.encrypt:
         key = b'pTuL7zxs6e3dAFMioJoS01OhBrO9SXGw'
         if args.nbytes % AES.block_size == 0:
-            cipher = AES.new(key, AES.MODE_CBC)
+            cipher = AES.new(key, AES.MODE_CBC, iv=b'GjfNgnikI8eAShCH')
         else:
-            cipher = Salsa20.new(key=key)
+            cipher = Salsa20.new(key=key, nonce=b'lj7BbRlB')
         msg = cipher.encrypt(msg)
 
     bits = [d for c in msg for d in '{0:08b}'.format(c)]
     nbits =  len(bits)
 
-    np.random.seed(17)
+    np.random.seed(10 + lib.seed)
     jumps = np.ones(nbits, dtype=int) if args.jump == 1 else np.random.randint(1, args.jump, size=nbits)
 
     ids_needed = np.sum(jumps) 

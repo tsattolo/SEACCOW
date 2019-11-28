@@ -7,6 +7,7 @@ import pdb, sys, os
 import numpy as np
 import pickle as pkl
 import argparse
+import library as lib
 
 # Dataset has 121733 TCP ISN and 9275031 IP ID
 
@@ -17,7 +18,7 @@ def main():
     field_fns = { 
                  'ip_id'   :   get_ip_id,
                  'ip_ttl'  :   get_ip_ttl,
-                 'tcp_isn' :   get_ip_id
+                 'tcp_isn' :   get_tcp_isn
                 }
                 
     parser = argparse.ArgumentParser()
@@ -48,7 +49,7 @@ def main():
     assert stop_filter(None), '%d ids available, %d needed' % (len(all_ids), ids_total)
 
 
-    np.random.seed(27)
+    np.random.seed(20 + lib.seed)
     id_iter = [all_ids[i*ids_per_iter:(i+1)*ids_per_iter] for i in range(args.iterations)]
     np.random.shuffle(id_iter)
     real_id_iter = [a[:len(a) // 2] for a in id_iter]
