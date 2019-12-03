@@ -41,3 +41,4 @@ source/software/relations/*.v
 pcap/
 *.pyc
 *.pdf
+data/
