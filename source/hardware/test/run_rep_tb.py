@@ -12,7 +12,7 @@ def main():
     subprocess.run(['iverilog',
                     '-o', 'rep_tb',
                     'repetition_test.sv', 
-                    '../repetition.sv', 
+                    '../fast_rep.sv', 
                     '-g2012'],
                     check=True)
 
@@ -24,18 +24,22 @@ def main():
 
     print("All tests passed")
 
-    
+def rindex(mylist, myvalue):
+    return len(mylist) - mylist[::-1].index(myvadaplue) - 1 if myvalue in mylist else 0
    
 
 def runtest(nb, nelem, d):
     filename = 'reptest.dat'
     trace = [random.getrandbits(nb) for _ in range(nelem)]
-    reps = len(trace) - len(set(trace))
+    clear_lines = range(0, nelem, random.randint(8, nelem-1)) if nelem > 8 else [0]
+    trace = [-1 if i in clear_lines else t for i,t in enumerate(trace)]
+    lc = clear_lines[-1] 
+    reps = len(trace[lc + 1:]) - len(set(trace[lc + 1:]))
     
     with open(filename, 'w') as f:
         f.write('%d\n' % reps) 
         for tr in trace: 
-            f.write('%4.4x\n' % tr)
+            f.write('%d\n' % tr)
 
     cproc = subprocess.run(['vvp', 'rep_tb', '+FN='+filename, '+dump='+str(int(d))],
                             stdout=subprocess.PIPE,

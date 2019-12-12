@@ -16,10 +16,17 @@ package global_types;
         logic [$clog2(BpW)-1:0] empty;
     } Line;
 
+    /* typedef struct packed { */
+    /*     Word data; */
+    /*     logic sop; */
+    /*     logic eop; */
+    /*     logic [$clog2(BpW)-1:0] empty; */
+    /* } avln_st; */
+
 endpackage
 
 interface avln_st;
-    Word data;
+    logic [W-1:0] data;
     logic sop;
     logic eop;
     logic [$clog2(BpW)-1:0] empty;

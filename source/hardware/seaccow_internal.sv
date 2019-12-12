@@ -33,19 +33,6 @@ module seaccow_internal (
         .valid(ip_id_valid)
     );
     
-    logic ip_id_rep_ready;
-    logic [IP_ID_SIZE-1:0] ip_id_rep;
-    repetition #(IP_ID_SIZE) rep0(
-        .sys_clk(sys_clk),
-        .reset_n(reset_n),
-        .clear(0),
-        .valid(ip_id_valid),
-        .field(ip_id),
-        .rep_rate(ip_id_rep),
-        .ready(ip_id_rep_ready)
-    );
-
-
     localparam IP_FLAGS_SIZE = 3;
     logic [IP_FLAGS_SIZE-1:0] ip_flags;
     logic ip_flags_valid;
@@ -58,6 +45,30 @@ module seaccow_internal (
         .valid(ip_flags_valid)
     );
     
+
+
+    logic ip_id_found;
+    assign LEDG[0] = ip_id_found;
+    windowing #(IP_ID_SIZE) win0 (
+        .sys_clk(sys_clk),
+        .reset_n(reset_n),
+        .valid(ip_id_valid),
+        .field(ip_id),
+        .found(ip_id_found)
+    );
+
+    /* /1* logic ip_id_rep_ready; *1/ */
+    /* logic [IP_ID_SIZE-1:0] ip_id_rep; */
+    /* fast_repetition #(IP_ID_SIZE) rep0( */
+    /*     .sys_clk(sys_clk), */
+    /*     .reset_n(reset_n), */
+    /*     .clear(ip_flags_valid), */
+    /*     .valid(ip_id_valid), */
+    /*     .field(ip_id), */
+    /*     .rep_rate(ip_id_rep), */
+    /*     /1* .ready(ip_id_rep_ready) *1/ */
+    /* ); */
+
 
     hex_decoder h0 (
         .data(ip_id_rep),
@@ -144,7 +155,7 @@ module get_field (
                 field <= in.data[W-1-OFFSET-:N_BITS];
                 valid <= 1;
             end
-            if (valid) valid <= 0;
+            else if (valid) valid <= 0;
         end
     end
 endmodule
