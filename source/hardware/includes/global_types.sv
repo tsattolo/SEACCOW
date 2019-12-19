@@ -4,9 +4,10 @@ package global_types;
     localparam BpW = W / B;
 
     /* `define max(a,b) = ((a > b) ? (a) : (b)); */
-    function integer max (integer a, integer b);
-        return a > b ? a : b;
-    endfunction
+
+    /* function integer max (integer a, integer b); */
+    /*     return a > b ? a : b; */
+    /* endfunction */
 
     typedef logic [W-1:0] Word;
     typedef struct packed {
@@ -16,22 +17,23 @@ package global_types;
         logic [$clog2(BpW)-1:0] empty;
     } Line;
 
-    /* typedef struct packed { */
-    /*     Word data; */
-    /*     logic sop; */
-    /*     logic eop; */
-    /*     logic [$clog2(BpW)-1:0] empty; */
-    /* } avln_st; */
+    typedef struct packed {
+        logic valid;
+        logic sop;
+        logic eop;
+        logic [$clog2(BpW)-1:0] empty;
+        Word data;
+    } avln_st;
 
 endpackage
 
-interface avln_st;
-    logic [W-1:0] data;
-    logic sop;
-    logic eop;
-    logic [$clog2(BpW)-1:0] empty;
-    logic valid;
-    logic ready;
-endinterface
+/* interface avln_st; */
+/*     logic [W-1:0] data; */
+/*     logic sop; */
+/*     logic eop; */
+/*     logic [$clog2(BpW)-1:0] empty; */
+/*     logic valid; */
+/*     logic ready; */
+/* endinterface */
 
 

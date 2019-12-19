@@ -7,13 +7,13 @@ module fast_repetition (
     output      [FIELD_SIZE-1:0]  rep_rate
 );
     parameter FIELD_SIZE = 16;
-    parameter REPETION_THRESHOLD = 1;
+    parameter REPETION_THRESHOLD = '1;
     parameter N_CLR = 3;
 
     localparam N_REP = 1; //$clog2(REPETION_THRESHOLD);
     localparam SIZE = 2 ** FIELD_SIZE;
     localparam WORD_SIZE = N_REP * N_CLR;
-    localparam INITIAL_MASK = (1 << N_REP) - 1;
+    localparam INITIAL_MASK = WORD_SIZE'((1 << N_REP) - 1);
 
     logic [WORD_SIZE-1:0] mem [SIZE];
     logic [WORD_SIZE-1:0] mem_out;
@@ -41,6 +41,8 @@ module fast_repetition (
             mem[i] = 0;
     end
     `endif
+    
+    
     
     always @(posedge sys_clk, negedge reset_n) begin
         if (~reset_n) begin
@@ -86,7 +88,7 @@ module fast_repetition (
             if (out_valid) begin
                 mem[waddr] <= mem_in;
             end
-            count <= (clear_d[2] ? 0 : count) + count_incr;
+            count <= (clear_d[2] ? '0 : count) + count_incr;
         end
     end
 endmodule
@@ -108,7 +110,7 @@ module windowing (
     logic [FIELD_SIZE-1:0] rep_rate;
     logic clear;
     
-    assign clear = window_count == 0;
+    assign clear = (window_count == 0) & valid;
     
     always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n) begin
@@ -116,7 +118,8 @@ module windowing (
             found <= 0;
         end
         else begin
-            window_count <= window_count + 1;
+            if (valid)
+                window_count <= window_count + '1;
             found <= rep_rate >= THRESHOLD;
         end
     end

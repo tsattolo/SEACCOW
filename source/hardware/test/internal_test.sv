@@ -10,19 +10,27 @@ module internal_test();
 
 
     initial begin
-        #25 reset_n = 1;
+        f = $fopen("packets.dat", "r");
+        $dumpfile("internal.vcd");
+        $dumpvars(0,internal_test);
+        #20 reset_n = 1;
     end
 
-    integer f, rc, sop, eop, data;
-    string filename = "packets.dat";
+    integer f, rc, sop, eop, data, end_count = 0;
 
-    f = $fopen(filename, "r");
     always @(negedge clk) begin
-        if ($feof(f)) 
-            $finish(0);
-        rc = $fscanf(f, "%x %x %x", sop, eop, data);
-        if (rc != 3)
-            $display("fscanf failed");
+        if (reset_n) begin
+            if ($feof(f)) begin 
+                end_count = end_count + 1;
+                if (end_count == 2 ** 16)
+                    $finish(0);
+            end
+            else begin
+                rc = $fscanf(f, "%x %x %x\n", sop, eop, data);
+                if (rc != 3)
+                    $display("fscanf failed");
+            end
+        end
     end
 
     assign rx.data = data;
@@ -33,7 +41,7 @@ module internal_test();
 
 
     seaccow_internal si0(
-            .sys_clk(sys_clk),
+            .sys_clk(clk),
             .reset_n(reset_n),
             .in(rx),
             .out(),

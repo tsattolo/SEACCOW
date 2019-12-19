@@ -1,55 +1,83 @@
 import global_types::*;
 
 module decision (
-    input       sys_clk,
-    input       reset_n,
-    input       found,
-    avln_st     in,
-    avln_st     fifo_out,
-    avln_st     out
+    input               sys_clk,
+    input               reset_n,
+    input               start,
+    input               valid,
+    input               found,
+    input  avln_st      in,
+    input  avln_st      fifo_out,
+    output avln_st      out,
+    output              drop
 );
 
-    parameter FOUND_DELAY = 4;
-    parameter CTR_SIZE = 10;
+    parameter CTR_SIZE = 24;
     parameter WINDOW_SIZE = 32;
+    parameter FOUND_DELAY = 4;
 
     localparam N_WND = $clog2(WINDOW_SIZE);
     localparam ADDR_SIZE = CTR_SIZE - N_WND;
-    localparam MEM_SIZE = 2 ** ADDR_SIZE;
+    localparam SIZE = 2 ** ADDR_SIZE;
 
     logic [ADDR_SIZE-1:0] raddr;
     logic [ADDR_SIZE-1:0] waddr;
 
-    assign raddr = out_counter[CTR_SIZE-1-:ADDR_SIZE];
-    assign waddr = found_counter[CTR_SIZE-1-:ADDR_SIZE];
-
-    logic [FOUND_DELAY-1:0] sop_sr;
-    logic [CTR_SIZE-1:0] found_counter;
     logic [CTR_SIZE-1:0] out_counter;
-    logic mem[MEM_SIZE];
+    logic [CTR_SIZE-1:0] frame_counter;
+    logic [CTR_SIZE-1:0] start_counter;
+    logic [CTR_SIZE-1:0] valid_counter[FOUND_DELAY];
+    logic mem[SIZE];
     
-    logic drop;
+    /* logic drop; */
+    avln_st fifo_out_d;
 
+    assign raddr = out_counter[CTR_SIZE-1-:ADDR_SIZE];
+    assign waddr = valid_counter[FOUND_DELAY-1][CTR_SIZE-1-:ADDR_SIZE];
+    assign drop = mem[raddr];
+
+    `ifdef __ICARUS__
+    initial begin
+        for (int i = 0; i < SIZE; i++)
+            mem[i] = 0;
+    end
+    `endif
+    
+    
+    integer i;
     always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n)  begin
-            sop_sr <= 0;
             out_counter <= 0;
-            found_counter <= 0;
+            frame_counter <= 0;
+            start_counter <= 0;
+            fifo_out_d <= 0;
+            out <= 0;
         end
         else begin
-            sop_sr <= {in.sop, sop_sr[FOUND_DELAY-1:1]}
-            found_counter <= found_counter + sop_sr[0];
+            if (start) 
+                start_counter <= frame_counter;
+            if (valid)
+                valid_counter[0] <= start_counter;
+
+            for (i = 0; i < FOUND_DELAY-1; i++)
+                valid_counter[i+1] <= valid_counter[i];
+
+
+
+            frame_counter <= frame_counter + in.sop;
             mem[waddr] <= found;
 
-            out_counter <= out_counter + out.sop;
-            drop <= mem[raddr];
+            out_counter <= out_counter + fifo_out.sop;
 
-            out.data <= fifo_out.data;
-            out.sop <= fifo_out.sop;
-            out.eop <= fifo_out.eop;
-            out.empty <= fifo_out.empty;
-            out.valid <= fifo_out.valid & ~drop;
+            fifo_out_d <= fifo_out;
+            out.data <= fifo_out_d.data;
+            out.sop <= fifo_out_d.sop;
+            out.eop <= fifo_out_d.eop;
+            out.empty <= fifo_out_d.empty;
+            out.valid <= fifo_out_d.valid & ~drop;
         end
         
     end
+
+    
 endmodule

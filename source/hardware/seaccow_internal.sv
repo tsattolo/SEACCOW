@@ -1,13 +1,16 @@
 import global_types::*;
+`define max(a,b) ((a > b) ? (a) : (b))
 
 module seaccow_internal (
     input       sys_clk,
     input       reset_n,
-    avln_st     in,
-    avln_st     out,
+    input       avln_st     in,
+    output      avln_st     out,
     output [6:0] hex_disp [2*BpW],
     output [8:0]     LEDG
 );
+    avln_st fifo_out;
+
     logic ipv4_start;
 
     find_ipv4_start fip0 (
@@ -24,38 +27,73 @@ module seaccow_internal (
     localparam IP_ID_SIZE = 16;
     logic [IP_ID_SIZE-1:0] ip_id;
     logic ip_id_valid;
-    get_field #(IP_ID_SIZE,1,0) get_ip_id (
-        .sys_clk(sys_clk),
-        .reset_n(reset_n),
-        .in(in),
-        .start(ipv4_start),
-        .field(ip_id),
-        .valid(ip_id_valid)
+    get_field #(
+        .FIELD_SIZE(IP_ID_SIZE),
+        .WORD_INDEX(1),
+        .OFFSET(0)
+    ) 
+        get_ip_id (
+            .sys_clk(sys_clk),
+            .reset_n(reset_n),
+            .in(in),
+            .start(ipv4_start),
+            .field(ip_id),
+            .valid(ip_id_valid)
     );
     
-    localparam IP_FLAGS_SIZE = 3;
-    logic [IP_FLAGS_SIZE-1:0] ip_flags;
-    logic ip_flags_valid;
-    get_field #(IP_FLAGS_SIZE,1,0) get_ip_flags (
-        .sys_clk(sys_clk),
-        .reset_n(reset_n),
-        .in(in),
-        .start(ipv4_start),
-        .field(ip_flags),
-        .valid(ip_flags_valid)
-    );
-    
-
-
+    localparam WINDOW_SIZE = 32;
     logic ip_id_found;
     assign LEDG[0] = ip_id_found;
-    windowing #(IP_ID_SIZE) win0 (
-        .sys_clk(sys_clk),
-        .reset_n(reset_n),
-        .valid(ip_id_valid),
-        .field(ip_id),
-        .found(ip_id_found)
+    windowing #(
+        .FIELD_SIZE(IP_ID_SIZE),
+        .WINDOW_SIZE(WINDOW_SIZE)
+    )
+        win0 (
+            .sys_clk(sys_clk),
+            .reset_n(reset_n),
+            .valid(ip_id_valid),
+            .field(ip_id),
+            .found(ip_id_found)
     );
+
+    localparam FIFO_ADDR_SIZE = 16;
+    fifo #(
+        .ADDR_W(FIFO_ADDR_SIZE)
+    )
+        f0 (
+            .sys_clk(sys_clk),
+            .reset_n(reset_n),
+            .in(in),
+            .out(fifo_out)
+    );
+
+    logic drop;
+    decision #(
+        .CTR_SIZE(FIFO_ADDR_SIZE), 
+        .WINDOW_SIZE(WINDOW_SIZE)
+    )
+        dec0 (
+            .sys_clk(sys_clk),
+            .reset_n(reset_n),
+            .start(ipv4_start),
+            .valid(ip_id_valid),
+            .found(ip_id_found),
+            .in(in),
+            .fifo_out(fifo_out),
+            .out(out),
+            .drop(drop)
+    );
+
+    logic [31:0] drop_count;
+    always @(posedge sys_clk or negedge reset_n) begin
+        if (~reset_n) begin
+            drop_count <= 0;
+        end else begin
+            drop_count <= drop_count + (drop & out.sop);
+        end
+    end
+            
+
 
     /* /1* logic ip_id_rep_ready; *1/ */
     /* logic [IP_ID_SIZE-1:0] ip_id_rep; */
@@ -70,26 +108,20 @@ module seaccow_internal (
     /* ); */
 
 
+    `ifndef __ICARUS__
     hex_decoder h0 (
-        .data(ip_id_rep),
+        .data(drop_count),
         .disp(hex_disp)
     );
+    `endif
     
     
-    fifo f0 (
-        .sys_clk(sys_clk),
-        .in(in),
-        .out(out)
-    );
-
-
-
 endmodule
 
 module count_words(
     input                       sys_clk,
     input                       reset_n,
-    avln_st                     in,
+    input avln_st               in,
     input                       start,
     input                       stop,
     input [CNT_SIZE-1:0]        target,
@@ -121,17 +153,17 @@ endmodule
 module get_field (
     input                       sys_clk,
     input                       reset_n,
-    avln_st                     in,
+    input avln_st               in,
     input                       start,
-    output logic [N_BITS-1:0]   field,
+    output logic [FIELD_SIZE-1:0]   field,
     output logic                valid
 );
 
-    parameter N_BITS = 8;
+    parameter FIELD_SIZE = 8;
     parameter WORD_INDEX = 0;
     parameter OFFSET = 0;
 
-    localparam CNT_SIZE = max($clog2(WORD_INDEX + 1), 1);
+    localparam CNT_SIZE = `max($clog2(WORD_INDEX + 1), 1);
 
     logic found;
 
@@ -141,7 +173,7 @@ module get_field (
         .in(in),
         .start(start),
         .stop(valid),
-        .target(WORD_INDEX),
+        .target(WORD_INDEX[CNT_SIZE-1:0]),
         .found(found)
     );
 
@@ -152,7 +184,7 @@ module get_field (
         end
         else begin
             if (found) begin
-                field <= in.data[W-1-OFFSET-:N_BITS];
+                field <= in.data[W-OFFSET-1:W-OFFSET-FIELD_SIZE];
                 valid <= 1;
             end
             else if (valid) valid <= 0;
@@ -164,7 +196,7 @@ endmodule
 module find_ipv4_start (
     input               sys_clk, 
     input               reset_n,
-    avln_st             in,
+    input avln_st       in,
     output logic        packet_start
 );
 
@@ -174,7 +206,7 @@ module find_ipv4_start (
 
     localparam NO_VLAN_ETHERTYPE_INDEX = 3;
     localparam MAX_VLAN_TAGS = 2;
-    localparam CNT_SIZE = max($clog2(NO_VLAN_ETHERTYPE_INDEX + MAX_VLAN_TAGS + 1), 1);
+    localparam CNT_SIZE = `max($clog2(NO_VLAN_ETHERTYPE_INDEX + MAX_VLAN_TAGS + 1), 1);
 
     logic found, packet_start_comb, notfound;
     logic [$clog2(MAX_VLAN_TAGS+1)-1:0] n_vlan_tags_comb;

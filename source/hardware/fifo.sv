@@ -2,14 +2,12 @@ import global_types::*;
 
 module fifo (
     input       sys_clk,
-    avln_st     in,
-    avln_st     out
+    input       reset_n,
+    input       avln_st     in,
+    output      avln_st     out
 );
-    parameter ADDR_W = 8;
+    parameter ADDR_W = 16;
     localparam SIZE = 2 ** ADDR_W;
-
-    logic full;
-    logic empty;
 
     Line in_line;
     Line out_line;
@@ -30,17 +28,23 @@ module fifo (
     assign out.empty = out_line.eop ? out_line.empty : '0;
     assign out.valid = out_line.eop ? '1 : out_line.empty[0];
 
-    assign in.ready = out.ready;
-
-    integer i;
+    `ifdef __ICARUS__
     initial begin
-        for (i = 0; i < SIZE; i = i +1)
+        for (int i = 0; i < SIZE; i++)
             mem[i] = 0;
     end
+    `endif
+    
     
     always_ff @(posedge sys_clk) begin
-        out_line  <= mem[addr];
-        mem[addr] <= in_line;
-        addr <= addr + '1;
+        if (~reset_n) begin
+            addr <= 0;
+            out_line <= 0;
+        end
+        else begin
+            out_line  <= mem[addr];
+            mem[addr] <= in_line;
+            addr <= addr + '1;
+        end
     end
 endmodule

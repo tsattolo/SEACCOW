@@ -89,9 +89,12 @@ module seaccow (
     );
 
 
-    avln_st tx_0();
-    avln_st rx_1();
+    avln_st tx_0;
+    avln_st rx_1;
+    wire tx_0_ready, rx_1_ready;
     wire [5:0] rx_error; 
+
+    assign rx_1_ready = tx_0_ready;
 	
     ethernet_pt pt_inst (
         .clk_clk                                (sys_clk),      
@@ -128,16 +131,16 @@ module seaccow (
 	.tse_0_transmit_endofpacket     (tx_0.eop),
 	.tse_0_transmit_empty           (tx_0.empty),
 	.tse_0_transmit_error           (0),
-	.tse_0_transmit_ready           (tx_0.ready),
 	.tse_0_transmit_valid           (tx_0.valid),
+	.tse_0_transmit_ready           (tx_0_ready),
 
 	.tse_1_receive_data             (rx_1.data),
 	.tse_1_receive_endofpacket      (rx_1.eop),
 	.tse_1_receive_startofpacket    (rx_1.sop),
 	.tse_1_receive_empty            (rx_1.empty),
 	.tse_1_receive_error            (rx_error),
-	.tse_1_receive_ready            (rx_1.ready),
-	.tse_1_receive_valid            (rx_1.valid)
+	.tse_1_receive_valid            (rx_1.valid),
+	.tse_1_receive_ready            (rx_1_ready)
 
     );
 
