@@ -42,3 +42,6 @@ pcap/
 *.pyc
 *.pdf
 data/
+*.vcd
+*.itb
+*.dat
