@@ -9,7 +9,7 @@ def main():
     ofilename = 'packets.dat'
     pl = rdpcap('http.pcap')[:32]
 
-    with open(ofilename, 'w') as f:
+    with open(ofilename, 'a') as f:
         for j in range(10):
             ids = [5] * len(pl) if j == 4 and not norep else range(len(pl))
             for p, i in zip(pl, ids):

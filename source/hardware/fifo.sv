@@ -16,17 +16,18 @@ module fifo (
 
     Line mem [SIZE];
     
+    logic ovalid;
 
     assign in_line.data  = in.data;
     assign in_line.sop   = in.sop;
     assign in_line.eop   = in.eop;
-    assign in_line.empty = in.eop ? in.empty :  in.valid;
+    assign in_line.empty = in.empty;
 
     assign out.data  = out_line.data;
-    assign out.sop   = out_line.sop;
-    assign out.eop   = out_line.eop;
-    assign out.empty = out_line.eop ? out_line.empty : '0;
-    assign out.valid = out_line.eop ? '1 : out_line.empty[0];
+    assign out.sop   = out_line.sop & ovalid;
+    assign out.eop   = out_line.eop & ovalid;
+    assign out.empty = out_line.empty;
+    assign out.valid = ovalid;
 
     `ifdef __ICARUS__
     initial begin
@@ -41,10 +42,14 @@ module fifo (
             addr <= 0;
             out_line <= 0;
         end
-        else begin
+        else if (in.valid) begin
             out_line  <= mem[addr];
             mem[addr] <= in_line;
-            addr <= addr + '1;
+            addr <= addr + 1'b1;
+            ovalid <= 1'b1;
+        end
+        else begin
+            ovalid <= 1'b0;
         end
     end
 endmodule

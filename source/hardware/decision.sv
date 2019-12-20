@@ -28,6 +28,8 @@ module decision (
     logic [CTR_SIZE-1:0] start_counter;
     logic [CTR_SIZE-1:0] valid_counter[FOUND_DELAY];
     logic mem[SIZE];
+
+    logic sopd;
     
     /* logic drop; */
     avln_st fifo_out_d;
@@ -52,19 +54,24 @@ module decision (
             start_counter <= 0;
             fifo_out_d <= 0;
             out <= 0;
+            sopd <= 0;
         end
         else begin
             if (start) 
                 start_counter <= frame_counter;
             if (valid)
                 valid_counter[0] <= start_counter;
+            /* valid_counter[0] <= frame_counter; */
 
             for (i = 0; i < FOUND_DELAY-1; i++)
                 valid_counter[i+1] <= valid_counter[i];
 
-
-
+            sopd <= in.sop;
+            if (sopd)
+                mem[frame_counter[CTR_SIZE-1-:ADDR_SIZE]] <= 0;
+        
             frame_counter <= frame_counter + in.sop;
+
             mem[waddr] <= found;
 
             out_counter <= out_counter + fifo_out.sop;
