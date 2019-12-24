@@ -150,6 +150,7 @@ module seaccow (
             .reset_n(core_reset_n),
             .in(rx_1),
             .out(tx_0),
+            .SW(SW),
             .hex_disp('{HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,HEX6,HEX7}),
             .LEDG(LEDG)
     );

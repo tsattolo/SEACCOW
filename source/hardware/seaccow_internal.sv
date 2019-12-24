@@ -5,6 +5,7 @@ module seaccow_internal (
     input       sys_clk,
     input       reset_n,
     input       avln_st     in,
+    input       [17:0] SW,
     output      avln_st     out,
     output [6:0] hex_disp [2*BpW],
     output [8:0]     LEDG
@@ -64,6 +65,7 @@ module seaccow_internal (
             .sys_clk(sys_clk),
             .reset_n(reset_n),
             .in(in),
+            .SW(SW),
             .out(fifo_out)
     );
 
