@@ -29,13 +29,12 @@ module decision (
     logic [CTR_SIZE-1:0] valid_counter[FOUND_DELAY];
     logic mem[SIZE];
 
-    logic sopd;
+    logic window_not_cleared, found_d;
     
     /* logic drop; */
     avln_st fifo_out_d;
 
     assign raddr = out_counter[CTR_SIZE-1-:ADDR_SIZE];
-    assign waddr = valid_counter[FOUND_DELAY-1][CTR_SIZE-1-:ADDR_SIZE];
     assign drop = mem[raddr];
 
     `ifdef __ICARUS__
@@ -54,26 +53,35 @@ module decision (
             start_counter <= 0;
             fifo_out_d <= 0;
             out <= 0;
-            sopd <= 0;
+            window_not_cleared <= 0;
+            found_d <= 0;
         end
         else begin
             if (start) 
                 start_counter <= frame_counter;
             if (valid)
                 valid_counter[0] <= start_counter;
-            /* valid_counter[0] <= frame_counter; */
 
             for (i = 0; i < FOUND_DELAY-1; i++)
                 valid_counter[i+1] <= valid_counter[i];
 
-            sopd <= in.sop;
-            if (sopd)
-                mem[frame_counter[CTR_SIZE-1-:ADDR_SIZE]] <= 0;
-        
+            found_d <= found;
+
+            if(in.sop) begin
+                window_not_cleared <= 1'b1;
+            end
+
+            if (found) begin
+                waddr <= valid_counter[FOUND_DELAY-1][CTR_SIZE-1-:ADDR_SIZE];
+            end
+            else if (in.sop | window_not_cleared) begin
+                waddr <= frame_counter[CTR_SIZE-1-:ADDR_SIZE];
+                window_not_cleared <= 1'b0;
+            end
+
+            mem[waddr] <= found_d;
+
             frame_counter <= frame_counter + in.sop;
-
-            mem[waddr] <= found;
-
             out_counter <= out_counter + fifo_out.sop;
 
             fifo_out_d <= fifo_out;

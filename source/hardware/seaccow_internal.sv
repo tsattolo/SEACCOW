@@ -71,7 +71,7 @@ module seaccow_internal (
 
     logic drop;
     decision #(
-        .CTR_SIZE(FIFO_ADDR_SIZE), 
+        .CTR_SIZE(FIFO_ADDR_SIZE + 1), 
         .WINDOW_SIZE(WINDOW_SIZE)
     )
         dec0 (

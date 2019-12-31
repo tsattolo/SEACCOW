@@ -16,13 +16,16 @@ module internal_test();
         #20 reset_n = 1;
     end
 
-    integer f, rc, sop, eop, data, end_count = 0;
+    integer f, rc, sop, eop, data, valid = 1, end_count = 0;
 
     always @(negedge clk) begin
         if (reset_n) begin
             if ($feof(f)) begin 
+                valid = 0;
+                eop = 0;
+                sop = 0;
                 end_count = end_count + 1;
-                if (end_count == 2 ** 16)
+                if (end_count == 2 ** 18)
                     $finish(0);
             end
             else begin
@@ -37,7 +40,7 @@ module internal_test();
     assign rx.sop = sop;
     assign rx.eop = eop;
     assign rx.empty = 0;
-    assign rx.valid = 1;
+    assign rx.valid = valid;
 
 
     seaccow_internal si0(
@@ -45,6 +48,7 @@ module internal_test();
             .reset_n(reset_n),
             .in(rx),
             .out(),
+            .SW(18'b0),
             .hex_disp(),
             .LEDG()
     );
