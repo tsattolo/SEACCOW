@@ -83,7 +83,7 @@ module repetition_test ();
 
     end
 
-    fast_repetition #(FIELD_SIZE) rep0(
+    repetition #(FIELD_SIZE) rep0(
         .sys_clk(clk),
         .reset_n(reset_n),
         .clear(clear),

@@ -12,12 +12,12 @@ def main():
     subprocess.run(['iverilog',
                     '-o', 'rep_tb',
                     'repetition_test.sv', 
-                    '../fast_rep.sv', 
+                    '../repetition.sv', 
                     '-g2012'],
                     check=True)
 
     nbs = [random.randint(1,16) for _ in range(100)]
-    nelems = [random.randint(1,20) for _ in range(100)]
+    nelems = [random.randint(1,40) for _ in range(100)]
     
     for nb, nelem in zip(nbs, nelems):
         runtest(nb, nelem, dump)
@@ -34,7 +34,7 @@ def runtest(nb, nelem, d):
     clear_lines = range(0, nelem, random.randint(8, nelem-1)) if nelem > 8 else [0]
     trace = [-1 if i in clear_lines else t for i,t in enumerate(trace)]
     lc = clear_lines[-1] 
-    reps = len(trace[lc + 1:]) - len(set(trace[lc + 1:]))
+    reps = len(trace[lc + 2:]) - len(set(trace[lc + 2:]))
     
     with open(filename, 'w') as f:
         f.write('%d\n' % reps) 
