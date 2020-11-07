@@ -11,31 +11,44 @@ from sklearn.linear_model import LogisticRegression
 from scipy import stats
 
 tx = 'rep'
-ty = 'lz77'
+ty = 'lzc'
 
 sns.set(style="white")
 
+n_iter = 1
+
+plt.rcParams.update({'font.size': 36})
+# plt.rcParams.update({'figure.autolayout': True})
+
 def main():
-    df_files = [
-                'tests1000WC.df',
-                'tests100WC.df',
-                'tests10WC.df',
-                'tests1WC.df',
-                ]
-    nbits = [1000, 100, 10, 1]
+    df_files = [sys.argv[1] + fn for fn in ['256.df', '64.df', '16.df', '4.df', '1.df']]
+    # df_files = [
+    #             'tests1000WC.df',
+    #             'tests100WC.df',
+    #             'tests10WC.df',
+    #             'tests1WC.df',
+    #             ]
+    nbits = [256, 64, 16, 4, 1]
     df_list = [pd.read_pickle(e) for e in df_files]
     
     
     for df,nb in zip(df_list, nbits):
         plt.figure()
-        xp = df[tx][1]
-        xn = df[tx][0]
+        
+        mean = np.mean([df[tx][1], df[tx][0] ])
+        std = np.std([df[tx][1], df[tx][0] ])
+        xp = (df[tx][1] - mean) / std
+        xn = (df[tx][0] - mean) / std
 
-        yp = df[ty][1]
-        yn = df[ty][0]
+        mean = np.mean([df[ty][1], df[ty][0] ])
+        std = np.std([df[ty][1], df[ty][0] ])
+        yp = (df[ty][1] - mean) / std
+        yn = (df[ty][0] - mean) / std
 
         
         examples = np.concatenate((np.array([xp, yp]).T, np.array([xn,yn]).T))
+        # examples -= np.mean(examples)
+        # examples /= np.std(examples)
         labels = np.concatenate((np.ones(len(xp)), np.zeros(len(yp))))
 
         
@@ -45,7 +58,7 @@ def main():
 
         acclist = []
 
-        for i in range(1000):
+        for i in range(n_iter):
             p = np.random.permutation(N)
             
             train_ex = examples[p][:split].copy()
@@ -58,13 +71,13 @@ def main():
             accuracy = clf.score(test_ex, test_lb)
             acclist.append(accuracy)
 
-            if i == 1:
-                xx, yy = np.mgrid[0:1:.01, 6:10:.01]
+            if i == 0:
+                xx, yy = np.mgrid[-3:3:.01, -3:3:.01]
                 grid = np.c_[xx.ravel(), yy.ravel()]
                 probs = clf.predict_proba(grid)[:, 1].reshape(xx.shape)
                 
                 f, ax = plt.subplots(figsize=(8, 6))
-                contour = ax.contourf(xx, yy, probs, 25, cmap="RdBu",
+                contour = ax.contourf(xx, yy, probs, 250, cmap="RdBu",
                                       vmin=0, vmax=1)
                 ax_c = f.colorbar(contour)
                 ax_c.set_label("Estimated Probability of Covert Channel")
@@ -75,7 +88,7 @@ def main():
                            cmap="RdBu", vmin=-.2, vmax=1.2,
                            edgecolor="white", linewidth=1)
 
-                ax.set( xlim=(0, 1), ylim=(6, 10), xlabel="Repetition", ylabel="LZ77")
+                ax.set( xlim=(-3, 3), ylim=(-3, 3), xlabel=tx.upper(), ylabel=ty.upper())
 
                 plt.savefig('clust/%i_%s_%s.png' %  (nb, tx, ty)) 
                 plt.savefig('clust/%i_%s_%s.pdf' %  (nb, tx, ty)) 

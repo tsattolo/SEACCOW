@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 
 
-import sys
+import sys, os
 import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
 from tabulate import tabulate
 
-tests = ['comp', 'lz77', 'lz78', 'lzc', 'ent', 'cce', 'rep', 'cov', 'ks', 'wcx', 'spr', 'reg']
+tests = ['lzma', 'lz77', 'lz78', 'lzc', 'foe', 'cce', 'rep', 'cov', 'ks', 'wcx', 'spr', 'reg']
+
+plt.rcParams.update({'font.size': 16})
+plt.rcParams.update({'figure.autolayout': True})
 
 rows = [
         'LZMA Compression',
@@ -29,8 +32,11 @@ columns = ['1-bit Trace Effect Size', 'Minimum Effect Size', 'Minimum Effect Siz
 def main():
     # df_files = ['testsWC.df', 'testsEQWC.df', 'testsXRWC.df', 'testsEQXRWC.df']
     # df_files = ['tests_rj.df','tests_nrj.df', 'tests10WC.df' ]
-    df_files = sys.argv[1:]
+    # df_files = sys.argv[1:]
     
+    df_files = [sys.argv[1] + fn for fn in ['1.df',  '16.df',  '256.df']]
+    styles = ['r.', 'g+', 'bx'] 
+    names = ['1-byte Message',  '16-byte Message',  '256-byte Message'] 
 
     # df_files = [
     #             'tests1000WC.df',
@@ -48,11 +54,12 @@ def main():
     #             ]
 
     df_list = [pd.read_pickle(e) for e in df_files]
-    styles = ['b.', 'r.', 'g.', 'y.'] + ['bx', 'rx', 'gx', 'yx'] + ['b+', 'r+', 'g+', 'y+']
-    names = ['Neither', 'Spaced', 'XORed', 'Both'] * 3
+    # styles = ['b.', 'r.', 'g.', 'y.'] + ['bx', 'rx', 'gx', 'yx'] + ['b+', 'r+', 'g+', 'y+']
+    # names = ['Neither', 'Spaced', 'XORed', 'Both'] * 3
     assert(len(styles) >= len(df_list))
 
     table = []
+    max_xtick_labels = 16
     for t in tests:
         plt.figure()
         for (df, style, name) in zip(df_list, styles, names):
@@ -66,23 +73,25 @@ def main():
             # print("Min Cohen's D for %s:" % t)
             cohend = (dfnz.mean() / sd).abs()
             # print('%d, %f' %(cohend.idxmin(), cohend.min()))
+            if '1-byte' in name: cohend = cohend[:8]
            
             table.append([cohend[1], cohend.min(), cohend.idxmin()])
             
             plt.plot(cohend, style, label=name)
             # plt.errorbar(dfnz.columns, dfnz.mean(), yerr=dfnz.std(), linestyle='None')
-            plt.xticks(dfnz.columns)
-            # plt.legend()
+            plt.xticks(dfnz.columns[::max(1,round((len(dfnz.columns)/max_xtick_labels)))])
+            plt.legend()
             plt.ylim(0,20)
             plt.xlabel('Bits / Element')
             plt.ylabel('Effect Size')
 
-        
-        plt.savefig('testplots/%s.pdf' %  t) 
-        plt.savefig('testplots/%s.png' %  t) 
+        folder = sys.argv[2]
+        os.makedirs(folder, exist_ok=True)
+        plt.savefig('%s/%s.pdf' %  (folder, t)) 
+        plt.savefig('%s/%s.png' %  (folder, t)) 
     
-    pdb.set_trace()
-    print(tabulate(table, headers=columns, showindex=rows))
+    # pdb.set_trace()
+    # print(tabulate(table, headers=columns, showindex=rows))
     
 
 if __name__ == "__main__":
