@@ -45,3 +45,5 @@ data/
 *.vcd
 *.itb
 *.dat
+*.bbl
+*.blg

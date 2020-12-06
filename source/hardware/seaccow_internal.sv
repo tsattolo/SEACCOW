@@ -87,15 +87,22 @@ module seaccow_internal (
     );
 
     logic [31:0] drop_count;
+    logic [31:0] found_count;
+    logic ip_id_found_d;
+    logic [31:0] ip_packet_count;
     always @(posedge sys_clk or negedge reset_n) begin
         if (~reset_n) begin
             drop_count <= 0;
+            found_count <= 0;
+            ip_id_found_d <= 0;
+            ip_packet_count <= 0;
         end else begin
             drop_count <= drop_count + (drop & out.sop);
+            ip_id_found_d <= ip_id_found;
+            found_count <= found_count + (ip_id_found & ~ip_id_found_d);
+            ip_packet_count <= ip_packet_count + ipv4_start;
         end
     end
-            
-
 
     /* /1* logic ip_id_rep_ready; *1/ */
     /* logic [IP_ID_SIZE-1:0] ip_id_rep; */
@@ -110,9 +117,13 @@ module seaccow_internal (
     /* ); */
 
 
+    logic [31:0] disp_count;
+    assign disp_count = SW[17] ? drop_count : (
+                        SW[16] ? found_count : (
+                        SW[15] ? ip_packet_count : 0));
     `ifndef __ICARUS__
     hex_decoder h0 (
-        .data(drop_count),
+        .data(disp_count),
         .disp(hex_disp)
     );
     `endif

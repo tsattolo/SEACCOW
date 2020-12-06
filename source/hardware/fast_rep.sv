@@ -102,7 +102,7 @@ module windowing (
 );
     parameter FIELD_SIZE = 16;
     parameter WINDOW_SIZE = 32;         // Must be power of 2
-    parameter THRESHOLD = 5;
+    parameter THRESHOLD = 1;
 
     localparam N_WND = $clog2(WINDOW_SIZE);
 
