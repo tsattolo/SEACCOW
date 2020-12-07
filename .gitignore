@@ -34,16 +34,9 @@ nios_workspace
 *.srec
 .qsys_edit
 greybox_tmp/
-compute_absrel
-*.blif
-source/software/relations/rel*x*/
-source/software/relations/*.v
-pcap/
 *.pyc
 *.pdf
 data/
 *.vcd
 *.itb
 *.dat
-*.bbl
-*.blg
