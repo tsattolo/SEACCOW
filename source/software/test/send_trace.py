@@ -8,9 +8,10 @@ def main():
     with open(sys.argv[1], 'rb') as f:
         traces = pkl.load(f)
     nbits = int(sys.argv[2])
+    nwind = int(sys.argv[3]) if len(sys.argv) >= 4 else len(traces[nbits])
 
     pl = []
-    for t in traces[nbits]:
+    for t in traces[nbits][:nwind]:
         for v in t:
             packet = Ether()/IP(dst="1.2.3.4")/TCP()/Raw('This is a TCP payload')
             packet.id = v
